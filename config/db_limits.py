@@ -12,12 +12,16 @@ class DatabaseBudgetExceeded(DatabaseError):
 @contextmanager
 def bounded_atomic():
     started = time.monotonic()
+    nested = connection.in_atomic_block
     with transaction.atomic():
         previous = None
         if connection.vendor == 'postgresql':
             with connection.cursor() as cursor:
-                cursor.execute("SELECT current_setting('lock_timeout'), current_setting('statement_timeout')")
-                previous = cursor.fetchone()
+                # SET LOCAL expires at the outer commit. Only a nested caller
+                # needs to read/restore the enclosing transaction's settings.
+                if nested:
+                    cursor.execute("SELECT current_setting('lock_timeout'), current_setting('statement_timeout')")
+                    previous = cursor.fetchone()
                 cursor.execute("SELECT set_config('lock_timeout', %s, true), set_config('statement_timeout', %s, true)",
                                [f'{settings.SESSION_LOCK_TIMEOUT_MS}ms', f'{settings.SESSION_STATEMENT_TIMEOUT_MS}ms'])
         def budget(execute, sql, params, many, context):

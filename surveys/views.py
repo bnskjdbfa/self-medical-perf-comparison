@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.cache import cache
 from django.db import DatabaseError, IntegrityError, transaction
+from django.db.models import Exists, OuterRef
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -87,7 +88,7 @@ logger = logging.getLogger(__name__)
 
 def _public_language(request: HttpRequest) -> str:
     requested = request.GET.get('lang')
-    if requested in {'ko', 'en'}:
+    if requested in {'ko', 'en'} and request.session.get(SESSION_PUBLIC_LANGUAGE, 'ko') != requested:
         request.session[SESSION_PUBLIC_LANGUAGE] = requested
     return request.session.get(SESSION_PUBLIC_LANGUAGE, 'ko')
 
@@ -200,7 +201,13 @@ def _get_persisted_respondent_context(
         return _invalid_login_context(request, 'incomplete_login_context')
 
     respondent = (
-        Respondent.objects.select_related('team')
+        Respondent.objects.select_related('team').annotate(
+            active_roster_exists=Exists(Participant.objects.filter(
+                team_id=OuterRef('team_id'), is_active=True,
+                normalized_name=OuterRef('normalized_name'),
+                birth_date=OuterRef('birth_date'), gender=OuterRef('gender'),
+            ))
+        )
         .filter(
             pk=respondent_id,
             team_id=team_id,
@@ -216,13 +223,7 @@ def _get_persisted_respondent_context(
         return _invalid_login_context(request, 'team_entry_closed')
     if expires_at != _team_login_expiry(team):
         return _invalid_login_context(request, 'team_schedule_changed')
-    if not Participant.objects.filter(
-        team=team,
-        is_active=True,
-        normalized_name=respondent.normalized_name,
-        birth_date=respondent.birth_date,
-        gender=respondent.gender,
-    ).exists():
+    if not respondent.active_roster_exists:
         return _invalid_login_context(request, 'participant_inactive_or_missing')
 
     current_day_no = calculate_team_day_no(team)
@@ -1645,13 +1646,14 @@ def _new_required_document_consent_state(
     team: Team,
     respondent: Respondent,
     language: str = 'ko',
+    enabled_types: tuple[str, ...] | None = None,
 ) -> dict:
     now_iso = _required_document_server_now().isoformat()
     return {
         'team_id': team.id,
         'respondent_id': respondent.id,
         'language': 'en' if language == 'en' else 'ko',
-        'enabled_document_types': list(get_enabled_required_document_types(team)),
+        'enabled_document_types': list(get_enabled_required_document_types(team) if enabled_types is None else enabled_types),
         'started_at': now_iso,
         'last_updated_at': now_iso,
         'consents': {},
@@ -1749,9 +1751,11 @@ def _get_required_document_consent_state(
     team: Team,
     respondent: Respondent,
     language: str = 'ko',
+    progress=None,
 ) -> tuple[dict, str | None]:
     language = 'en' if language == 'en' else 'ko'
-    enabled_types = get_enabled_required_document_types(team)
+    progress = progress if progress is not None else get_required_document_progress(team=team, respondent=respondent)
+    enabled_types = progress.enabled_types
     existing_state = request.session.get(SESSION_REQUIRED_DOCUMENT_CONSENTS)
     now = _required_document_server_now()
     reset_reason = None
@@ -1781,11 +1785,12 @@ def _get_required_document_consent_state(
             team=team,
             respondent=respondent,
             language=language,
+            enabled_types=enabled_types,
         )
         request.session[SESSION_REQUIRED_DOCUMENT_CONSENTS] = state
         return state, reset_reason
 
-    submitted_types = get_submitted_required_document_types(team=team, respondent=respondent)
+    submitted_types = progress.submitted_types
     stale_types = set(existing_state['consents']) & set(submitted_types)
     if stale_types:
         state = {
@@ -1814,6 +1819,7 @@ def _get_required_document_consent_state(
             team=team,
             respondent=respondent,
             language=language,
+            enabled_types=enabled_types,
         )
         request.session[SESSION_REQUIRED_DOCUMENT_CONSENTS] = state
         return state, 'expired_or_invalid'
@@ -1885,7 +1891,8 @@ def preview_v2_documents_next_view(request: HttpRequest) -> HttpResponse:
         return redirect('surveys:preview-v2-code')
     team, respondent = context_entities
     page_language = _public_language(request)
-    pending_types = _pending_required_document_types(team=team, respondent=respondent)
+    progress = get_required_document_progress(team=team, respondent=respondent)
+    pending_types = [kind for kind in progress.enabled_types if kind not in progress.submitted_types]
     if not pending_types:
         request.session.pop(SESSION_REQUIRED_DOCUMENT_CONSENTS, None)
         return redirect('surveys:preview-v2-home')
@@ -1894,6 +1901,7 @@ def preview_v2_documents_next_view(request: HttpRequest) -> HttpResponse:
         team=team,
         respondent=respondent,
         language=page_language,
+        progress=progress,
     )
     next_document_type = _next_unrecorded_document_type(state, pending_types) or pending_types[-1]
     return redirect('surveys:preview-v2-document', document_type=next_document_type)
@@ -1905,7 +1913,8 @@ def preview_v2_document_view(request: HttpRequest, document_type: str) -> HttpRe
         return redirect('surveys:preview-v2-code')
     team, respondent = context_entities
     page_language = _public_language(request)
-    pending_types = _pending_required_document_types(team=team, respondent=respondent)
+    progress = get_required_document_progress(team=team, respondent=respondent)
+    pending_types = [kind for kind in progress.enabled_types if kind not in progress.submitted_types]
     if not pending_types:
         request.session.pop(SESSION_REQUIRED_DOCUMENT_CONSENTS, None)
         return redirect('surveys:preview-v2-home')
@@ -1914,6 +1923,7 @@ def preview_v2_document_view(request: HttpRequest, document_type: str) -> HttpRe
         team=team,
         respondent=respondent,
         language=page_language,
+        progress=progress,
     )
     next_document_type = _next_unrecorded_document_type(state, pending_types)
     display_document_type = next_document_type or pending_types[-1]
@@ -1927,7 +1937,6 @@ def preview_v2_document_view(request: HttpRequest, document_type: str) -> HttpRe
         else:
             messages.warning(request, '필수 문서 설정 또는 로그인 정보가 변경되어 다시 확인이 필요합니다.')
 
-    progress = get_required_document_progress(team=team, respondent=respondent)
     form = RequiredDocumentAgreementForm(request.POST or None)
     if request.method == 'POST':
         if state_reset_reason:
@@ -2196,12 +2205,12 @@ def preview_v2_home_view(request: HttpRequest) -> HttpResponse:
         return redirect('surveys:preview-v2-code')
     team, respondent = context_entities
     page_language = _public_language(request)
-    if get_next_pending_required_document(team=team, respondent=respondent):
+    required_document_progress = get_required_document_progress(team=team, respondent=respondent)
+    if not required_document_progress.is_complete:
         return redirect('surveys:preview-v2-documents-next')
     health_state = _health_check_state(team=team, respondent=respondent)
     current_day_no = health_state.current_day_no
     health_completed = health_state.completed
-    required_document_progress = get_required_document_progress(team=team, respondent=respondent)
     home_url = reverse('surveys:preview-v2-home')
     reflection_completed = ReflectionSubmission.objects.filter(
         team=team,

@@ -193,6 +193,12 @@ class SessionStore(DBStore):
         self.increments[key] = self.increments.get(key, 0) + amount
         self.modified = True
 
+    def has_changes(self):
+        """Ignore equivalent assignments, but never skip rotation/revocation."""
+        return bool(self.flushed or self.rotating or self.increments or (
+            self.modified and (self.baseline is None or self._get_session() != self.baseline)
+        ))
+
     def save(self, must_create=False, *, finalizing=False):
         Family, Credential = models()
         desired = deepcopy(self._get_session())

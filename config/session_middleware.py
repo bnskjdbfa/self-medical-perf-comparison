@@ -53,7 +53,7 @@ class ConcurrentSessionMiddleware(SessionMiddleware):
             if response.status_code >= 500 or getattr(request, 'session_commit_failed', False):
                 return response
             session = request.session
-            changed = session.modified
+            changed = session.has_changes()
             recovery_page = context.stale and request.method == 'GET' and request.path == '/surveys/preview/v2/code/'
             if not recovery_page and (changed or session.flushed or (context.legacy and not session.is_empty())):
                 session.save(finalizing=True)
