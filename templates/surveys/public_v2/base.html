@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ page_language|default:'ko' }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="only light" />
+    <meta name="supported-color-schemes" content="light" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>{% block title %}v2 Preview{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'surveys/public_v2.css' %}" />
+    <link rel="stylesheet" href="{% static 'surveys/motion.css' %}" />
+  </head>
+  <body class="public-v2-preview">
+    <main class="public-v2-shell">
+      <p class="public-v2-badge">Preview · 기존 public URL 미전환</p>
+      {% block messages %}
+      {% if messages %}
+      <div class="public-v2-messages" role="status">
+        {% for message in messages %}<p class="is-{{ message.level_tag }}">{{ message }}</p>{% endfor %}
+      </div>
+      {% endif %}
+      {% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

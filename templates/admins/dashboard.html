@@ -1,0 +1,8 @@
+<h1>제출 현황 대시보드</h1>
+<ul>
+  {% for row in summary %}
+    <li>{{ row.day_no }}일차: {{ row.total }}건</li>
+  {% empty %}
+    <li>제출 데이터가 없습니다.</li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,189 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>관리자 조회 화면</title>
+    <link rel="stylesheet" href="{% static 'admins/manager_lookup.css' %}" />
+    <script src="{% static 'admins/manager_lookup.js' %}" defer></script>
+  </head>
+  <body class="manager-lookup-body">
+    <main
+      id="manager-app"
+      class="manager-lookup-page manager-theme--{{ active_tab }}"
+      data-manager-app
+      data-active-tab="{{ active_tab }}"
+    >
+      <section class="manager-lookup-shell">
+        <header class="manager-brand-card">
+          <p class="manager-brand-greeting">안녕하세요</p>
+          <h1 class="manager-brand-name">{{ team_name }}</h1>
+        </header>
+
+        <nav class="manager-tab-card" aria-label="제출 항목">
+          {% for tab in manager_tabs %}
+          <a
+            class="manager-tab manager-tab--{{ tab.theme }}{% if active_tab == tab.key %} is-active{% endif %}"
+            href="?tab={{ tab.key }}"
+            data-manager-nav
+            {% if active_tab == tab.key %}aria-current="page"{% endif %}
+          >
+            <span class="manager-tab-icon">
+              {% if tab.key == 'documents' %}
+              <img src="{% static 'surveys/icons/v2-home/document.png' %}" alt="" />
+              {% elif tab.key == 'health' %}
+              <img src="{% static 'surveys/icons/v2-health-start/heart.png' %}" alt="" />
+              {% elif tab.key == 'reflection' %}
+              <img src="{% static 'surveys/icons/v2-home/reflection-document.svg' %}" alt="" />
+              {% else %}
+              <img src="{% static 'surveys/icons/v2-questionnaire/clipboard.svg' %}" alt="" />
+              {% endif %}
+            </span>
+            <span class="manager-tab-label">{{ tab.label }}</span>
+          </a>
+          {% endfor %}
+        </nav>
+
+        <section class="manager-summary-grid" aria-label="요약 통계">
+          <article class="manager-summary-card">
+            <strong class="manager-summary-value">{{ summary.total_count }}</strong>
+            <span class="manager-summary-label">대상자 수</span>
+          </article>
+          <article class="manager-summary-card">
+            <strong class="manager-summary-value">{{ summary.submitted_count }}</strong>
+            <span class="manager-summary-label">제출자 수</span>
+          </article>
+          <article class="manager-summary-card">
+            <strong class="manager-summary-value">{{ summary.pending_count }}</strong>
+            <span class="manager-summary-label">미 제출자 수</span>
+          </article>
+        </section>
+
+        <section class="manager-filter-section">
+          <header class="manager-section-heading manager-section-heading--filter">
+            <img src="{% static 'admins/icons/search1.svg' %}" alt="" />
+            <h2>Research filter</h2>
+          </header>
+
+          <article class="manager-filter-card">
+            {% if has_team_permission %}
+            <form method="get" action="{{ search_url }}" class="manager-filter-form" data-manager-form>
+              <input type="hidden" name="tab" value="{{ active_tab }}" />
+              {% if is_health_tab %}
+              <label class="manager-field">
+                <span class="sr-only">일차</span>
+                <select name="day_no" aria-label="일차">
+                  {% for option in day_options %}
+                  <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>
+                    {{ option.label }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </label>
+              {% endif %}
+
+              <label class="manager-field">
+                <span class="sr-only">제출 상태</span>
+                <select name="submission_status" aria-label="제출 상태">
+                  {% for option in submission_status_options %}
+                  <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>
+                    {{ option.label }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </label>
+
+              {% if is_health_tab %}
+              <label class="manager-field">
+                <span class="sr-only">위험 단계</span>
+                <select name="risk_level" aria-label="위험 단계">
+                  {% for option in risk_level_options %}
+                  <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>
+                    {{ option.label }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </label>
+              {% endif %}
+
+              <label class="manager-field">
+                <span class="sr-only">이름 검색</span>
+                <input
+                  type="search"
+                  name="name_keyword"
+                  value="{{ filters.name_keyword }}"
+                  placeholder="이름"
+                  aria-label="이름 검색"
+                />
+              </label>
+
+              <div class="manager-filter-actions">
+                <button type="submit" class="manager-button manager-button--search">조회</button>
+                <a href="{{ reset_url }}" class="manager-button manager-button--reset" data-manager-nav>초기화</a>
+              </div>
+            </form>
+            {% else %}
+            <p class="manager-empty-state">조회 가능한 팀이 없습니다.</p>
+            {% endif %}
+          </article>
+        </section>
+
+        <section class="manager-list-section">
+          <header class="manager-section-heading">
+            <img src="{% static 'admins/icons/people.svg' %}" alt="" />
+            <h2>대상자 목록</h2>
+          </header>
+
+          <article class="manager-list-card">
+            {% if rows %}
+            <ul class="manager-result-list">
+              {% for row in rows %}
+              <li class="manager-result-row{% if row.is_danger %} is-danger{% endif %}">
+                {% if row.result_url %}
+                <a class="manager-result-name" href="{{ row.result_url }}">{{ row.name }}</a>
+                {% else %}
+                <span class="manager-result-name">{{ row.name }}</span>
+                {% endif %}
+                {% if row.phone_href %}
+                <a class="manager-result-phone" href="{{ row.phone_href }}">{{ row.phone }}</a>
+                {% else %}
+                <span class="manager-result-phone">{{ row.phone }}</span>
+                {% endif %}
+                <span class="manager-result-gender">{{ row.gender }}</span>
+                {% if is_health_tab %}
+                <span class="manager-result-score">{{ row.score_label }}</span>
+                {% endif %}
+                <span class="manager-result-badge manager-result-badge--{{ row.status_key }}">
+                  {{ row.status_label }}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <div class="manager-empty-state manager-empty-state--list">
+              조건에 맞는 대상자가 없습니다.
+            </div>
+            {% endif %}
+
+            {% if pagination.total_count %}
+            <nav class="manager-pagination" aria-label="대상자 목록 페이지">
+              {% if pagination.has_previous %}
+              <a class="manager-page-button" href="{{ pagination.previous_url }}" data-manager-nav>이전</a>
+              {% else %}
+              <span class="manager-page-button is-disabled">이전</span>
+              {% endif %}
+              <span class="manager-page-status">{{ pagination.page }} / {{ pagination.page_count }}</span>
+              {% if pagination.has_next %}
+              <a class="manager-page-button" href="{{ pagination.next_url }}" data-manager-nav>다음</a>
+              {% else %}
+              <span class="manager-page-button is-disabled">다음</span>
+              {% endif %}
+            </nav>
+            {% endif %}
+          </article>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+:root {
+  --motion-fast: 140ms;
+  --motion-base: 280ms;
+  --motion-slow: 440ms;
+  --motion-ease: cubic-bezier(.22, .8, .28, 1);
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes item-enter {
+  from { opacity: 0; transform: translate3d(0, 14px, 0) scale(.99); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes error-enter {
+  0% { opacity: 0; transform: translateX(0); }
+  35% { opacity: 1; transform: translateX(-4px); }
+  70% { transform: translateX(3px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes completion-pop {
+  0% { opacity: 0; transform: scale(.78) rotate(-4deg); }
+  70% { opacity: 1; transform: scale(1.04) rotate(1deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes survey-enter-forward {
+  from { opacity: 0; transform: translate3d(18px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes survey-enter-backward {
+  from { opacity: 0; transform: translate3d(-18px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+body > main {
+  animation: page-enter var(--motion-base) var(--motion-ease) both;
+}
+
+.v2-home-header,
+.v2-menu-card,
+.v2-page-header,
+.v2-identity-field,
+.v2-health-start-hero,
+.v2-health-start-intro,
+.v2-health-start-guide > article,
+.v2-survey-start-hero,
+.v2-survey-start-intro,
+.v2-survey-start-notice,
+.v2-reflection-hero,
+.v2-reflection-intro,
+.v2-reflection-field,
+.result-header,
+.result-days,
+.result-card,
+.detail-section,
+.status-header,
+.section-card,
+.respondent-header,
+.respondent-main {
+  animation: item-enter var(--motion-slow) var(--motion-ease) both;
+}
+
+.v2-menu-card:nth-of-type(2),
+.v2-identity-field:nth-child(2),
+.v2-health-start-guide > article:nth-child(2),
+.result-card:nth-child(2),
+.section-card:nth-child(2) { animation-delay: 55ms; }
+
+.v2-menu-card:nth-of-type(3),
+.v2-identity-field:nth-child(3),
+.v2-health-start-guide > article:nth-child(3) { animation-delay: 110ms; }
+
+.v2-menu-card:nth-of-type(4),
+.v2-identity-field:nth-child(4) { animation-delay: 165ms; }
+
+a,
+button,
+input,
+select,
+textarea,
+.v2-menu-card,
+.survey-choice,
+.result-day {
+  transition:
+    transform var(--motion-fast) var(--motion-ease),
+    opacity var(--motion-fast) ease,
+    box-shadow var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    background-color var(--motion-base) ease;
+}
+
+a:active,
+button:active,
+.v2-menu-card:active,
+.survey-choice:active { transform: scale(.975); }
+
+button:disabled,
+[aria-busy="true"] { cursor: wait; opacity: .68; }
+
+.v2-inline-errors:not([hidden]),
+.survey-errors:not([hidden]),
+.v2-reflection-field__error,
+.public-v2-messages {
+  animation: error-enter 320ms ease both;
+}
+
+.v2-menu-arrow img,
+.v2-completion__check,
+.v2-completion__illustration {
+  transform-origin: center;
+  animation: completion-pop var(--motion-slow) var(--motion-ease) both;
+}
+
+.v2-completion__copy {
+  animation: item-enter var(--motion-slow) 100ms var(--motion-ease) both;
+}
+
+.v2-completion__button {
+  animation: item-enter var(--motion-slow) 180ms var(--motion-ease) both;
+}
+
+.survey-question-card.is-entering-forward {
+  animation: survey-enter-forward 240ms var(--motion-ease) both;
+}
+
+.survey-question-card.is-entering-backward {
+  animation: survey-enter-backward 240ms var(--motion-ease) both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v2-menu-card:hover,
+  .result-card:hover,
+  .section-card:hover { transform: translateY(-3px); }
+  a:hover,
+  button:hover { filter: brightness(1.015); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

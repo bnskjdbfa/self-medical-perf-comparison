@@ -1,0 +1,29 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}{{ eyebrow }} 제출 완료{% endblock %}
+{% block content %}
+<section
+  class="v2-completion v2-completion--{{ completion_type }}"
+  style="--completion-accent: {{ accent }};"
+  aria-labelledby="v2-completion-title"
+>
+  <p class="v2-completion__eyebrow">{% if page_language == 'en' %}{{ eyebrow_en }}{% else %}{{ eyebrow }}{% endif %}</p>
+
+  <div class="v2-completion__illustration" aria-hidden="true">
+    {% if asset_key == 'reflection' %}
+      <img class="v2-completion__reflection" src="{% static 'surveys/icons/v2-completion/reflection.svg' %}" alt="" />
+    {% else %}
+      <img class="v2-completion__base" src="{% static 'surveys/icons/v2-completion/'|add:asset_key|add:'-base.svg' %}" alt="" />
+      <img class="v2-completion__check" src="{% static 'surveys/icons/v2-completion/'|add:asset_key|add:'-check.svg' %}" alt="" />
+    {% endif %}
+  </div>
+
+  <div class="v2-completion__copy">
+    <h1 id="v2-completion-title">{% if page_language == 'en' %}Submission Complete!{% else %}제출이 완료되었습니다!{% endif %}</h1>
+    <p>{% if page_language == 'en' %}{{ message_en }}<br />successfully submitted.{% else %}{{ message }}<br />정상적으로 완료되었습니다.{% endif %}</p>
+    <p class="v2-completion__thanks">{% if page_language == 'en' %}Thank you for your cooperation.{% else %}협조해주셔서 감사드립니다.{% endif %}</p>
+  </div>
+
+  <a class="v2-completion__button" href="{{ button_url }}">{% if page_language == 'en' %}{{ button_label_en }}{% else %}{{ button_label }}{% endif %}</a>
+</section>
+{% endblock %}

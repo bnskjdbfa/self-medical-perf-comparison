@@ -1,0 +1,22 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  {% if original %}
+    <li>
+      <a href="{% url 'admin:teams_team_consent_excel' original.pk %}">
+        동의서 현황 Excel 다운로드
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'admin:teams_team_consent_zip' original.pk %}">
+        전자 동의 확인서 ZIP 다운로드
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'admin:teams_team_reflection_zip' original.pk %}">
+        소감문 ZIP 다운로드
+      </a>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

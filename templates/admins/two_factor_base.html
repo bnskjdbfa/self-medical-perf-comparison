@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}관리자 2단계 인증{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'admins/two_factor.css' %}" />
+  </head>
+  <body>
+    <main class="two-factor-page">
+      <section class="two-factor-card">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  {% if original and has_add_permission %}
+    <li>
+      <a href="{% url 'admin:surveys_commonquestionset_clone' original.pk %}">
+        다른 일차로 복제
+      </a>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

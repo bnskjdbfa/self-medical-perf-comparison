@@ -1,0 +1,74 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">홈</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural }}</a>
+  &rsaquo; <a href="{{ upload_url }}">일괄등록</a>
+  &rsaquo; 확인
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>
+  팀 <strong>{{ team.name }}</strong> · 파일 <code>{{ file_name }}</code> · 전체 {{ summary.total }}행
+  {% if update_existing %}· 중복 데이터 갱신{% else %}· 중복 데이터 건너뜀{% endif %}
+</p>
+<p>
+  생성 <strong>{{ summary.create }}</strong>건 ·
+  갱신 <strong>{{ summary.update }}</strong>건 ·
+  건너뜀 <strong>{{ summary.skip }}</strong>건 ·
+  오류 <strong>{{ summary.error }}</strong>건 ·
+  동의 대기(만 14세 미만) <strong>{{ summary.pending }}</strong>건 ·
+  동의 확인 기록 <strong>{{ summary.verified }}</strong>건
+</p>
+{% if summary.error %}
+<p class="errornote">
+  오류 행 {{ summary.error }}건은 저장되지 않습니다.
+  <a href="{{ errors_url }}">오류 행 CSV 내려받기</a>
+</p>
+{% endif %}
+{% if summary.pending %}
+<p class="warning">
+  동의 대기 {{ summary.pending }}건은 등록되지만 법정대리인 동의를 확인하고 체크하기 전까지 로그인할 수 없습니다.
+</p>
+{% endif %}
+
+<div class="results" style="overflow-x:auto">
+<table>
+  <thead>
+    <tr>
+      <th>행</th><th>이름</th><th>생년월일</th><th>연락처</th><th>성별</th>
+      <th>처리</th><th>법정대리인 동의</th><th>비고</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for plan in plans %}
+    <tr{% if plan.is_error %} class="row-error"{% endif %}>
+      <td>{{ plan.row_no }}</td>
+      <td>{{ plan.name }}</td>
+      <td>{{ plan.birth_date }}</td>
+      <td>{{ plan.phone }}</td>
+      <td>{{ plan.gender|default:"" }}</td>
+      <td>{% if plan.is_error %}<strong>{{ plan.action_label }}</strong>{% else %}{{ plan.action_label }}{% endif %}</td>
+      <td>{{ plan.consent_label }}</td>
+      <td>{{ plan.message }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if applied %}
+<p><strong>이 목록은 이미 저장되었습니다.</strong> <a href="{% url opts|admin_urlname:'changelist' %}?team__id__exact={{ team.pk }}">참가자 목록 보기</a></p>
+{% else %}
+<form method="post" style="margin-top:16px">
+  {% csrf_token %}
+  <button type="submit" class="default">확인하고 저장</button>
+  <a href="{{ upload_url }}">다른 파일 올리기</a>
+</form>
+{% endif %}
+{% endblock %}

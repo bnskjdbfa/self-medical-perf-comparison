@@ -1,0 +1,20 @@
+<h1>응답 상세</h1>
+<p>팀: {{ submission.team.name }} ({{ submission.team.code }})</p>
+<p>응답자: {{ submission.respondent.name }}</p>
+<p>일차: {{ submission.day_no }}</p>
+<p>제출 시각: {{ submission.submitted_at|date:"Y-m-d H:i" }}</p>
+<ul>
+  {% for answer in submission.answers %}
+    <li>{{ answer.question_label }}: {{ answer.display_answer }}</li>
+  {% empty %}
+    <li>문항별 답변 데이터가 없습니다.</li>
+  {% endfor %}
+</ul>
+<h2>주관식 답변</h2>
+<ul>
+  {% for answer in submission.subjective_answers %}
+    <li>{{ answer.question_label }}: {{ answer.display_answer }}</li>
+  {% empty %}
+    <li>주관식 답변이 없습니다.</li>
+  {% endfor %}
+</ul>

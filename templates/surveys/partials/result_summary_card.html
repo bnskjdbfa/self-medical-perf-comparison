@@ -1,0 +1,31 @@
+{% load static %}
+<article class="result-card result-card--{{ result.key }}">
+  <div class="result-card__footer-layer">
+    <a class="result-card__detail" href="{{ result.detail_url }}">
+      <span>{% if page_language == 'en' %}View Details{% else %}자세히 보기{% endif %}</span>
+      <img src="{% static detail_icon_path %}" alt="" />
+    </a>
+  </div>
+  <div class="result-card__panel">
+    <h2 class="result-card__title">{% if result.key == 'body' %}Health{% else %}Psychology{% endif %}</h2>
+    <div class="result-card__score-block">
+      <div class="result-card__score-copy">
+        <strong class="result-card__status">{{ result.status_label }}</strong>
+        <span class="result-card__score-label">score</span>
+      </div>
+      <span class="result-card__score">{{ result.score }}</span>
+    </div>
+
+    <div class="result-card__segments" aria-hidden="true">
+      {% for segment in result.segments %}
+      <span
+        class="result-card__segment{% if forloop.counter <= result.filled_segments %} result-card__segment--filled{% endif %}"
+      ></span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="result-card__icon">
+    <img src="{% static icon_path %}" alt="" />
+  </div>
+  <span class="result-sr-only">{{ result.special_notes_label }}</span>
+</article>

@@ -1,0 +1,121 @@
+{% if document_type == 'privacy_consent' %}
+  <p>
+    <strong>{{ team.organization_name_en|default:team.organization_name|default:team.name }}</strong>, the operating organization,
+    collects and uses personal information under Article 15 of the Personal Information
+    Protection Act to operate “{{ team.name }}.”
+    Hwasung Company Co., Ltd., as the entrusted processor, performs the platform
+    operation and practical personal information processing for this program.
+  </p>
+
+  <p><br><strong>1. Purposes of collection and use</strong><br>
+    Participant identity verification, participant list and tour schedule management,
+    participant safety management, ferry passenger list preparation and ticketing,
+    travel insurance enrollment support, and accident handling support
+  </p>
+
+  <p><br><strong>2. Personal information collected and used</strong><br>
+    A. Information collected and stored by the online platform<br>
+    Name, date of birth, gender, and mobile phone number<br><br>
+    B. Information processed through the operating organization’s separate participant
+    list and business procedures<br>
+    Nationality, address, affiliation, and email address<br>
+    These items apply only when actually processed and are not stored in the online platform database.
+  </p>
+
+  <p><br><strong>3. Retention and use period</strong><br>
+    The information is retained for three years after completion of the final project
+    report and inspection and is then destroyed without delay. Information that must be
+    retained under applicable law is kept only for the items and periods required by law.
+  </p>
+
+  <p><br><strong>4. Entrustment of personal information processing</strong><br>
+    Processor: Hwasung Company Co., Ltd.<br>
+    Entrusted work: online participant identity verification, electronic consent
+    management, platform maintenance and operation, and participant support<br>
+    Entrustment period: until the entrustment contract or entrusted work ends
+  </p>
+
+  <p><br><strong>5. Right to refuse and possible disadvantage</strong><br>
+    You may refuse consent. However, this information is required for identity
+    verification, ferry ticketing, travel insurance enrollment support, and tour
+    operation, so participation may be restricted if you refuse.
+  </p>
+
+  <p class="v2-document-notice">
+    ※ Resident registration numbers and other unique identifiers required for travel
+    insurance are processed by the insurer or through a separate lawful insurance
+    procedure. This online platform does not collect, store, transmit, or display
+    resident registration numbers, masked resident registration numbers, alien
+    registration numbers, or passport numbers.
+  </p>
+{% elif document_type == 'third_party_consent' %}
+  <p>
+    <strong>{{ team.organization_name_en|default:team.organization_name|default:team.name }}</strong>, the operating organization,
+    intends to provide personal information to the following third parties under
+    Article 17 of the Personal Information Protection Act and applicable laws to
+    operate “{{ team.name }}.”
+  </p>
+
+  <p><br><strong>1. Recipients</strong> :<br>
+    Ferry operators: Daezer Ferry, Ulleung Cruise, Jeongdo Industry, Dokdo Cruise,
+    and Daezer Shipping<br>
+    Travel insurers: DB Insurance and Meritz Fire &amp; Marine Insurance
+  </p>
+
+  <p><br><strong>2. Purposes of use by recipients</strong> :<br>
+    Ferry operator: passenger list preparation, ferry ticketing, and identity
+    verification under Article 21-2 of the Marine Transportation Act<br>
+    Insurer: travel accident insurance enrollment, contract administration, and claim handling
+  </p>
+
+  <p><br><strong>3. Personal information provided</strong> :<br>
+    Name, date of birth, gender, phone number, and address<br>
+    Only the minimum information necessary for each recipient’s stated purpose is provided.
+  </p>
+
+  <p><br><strong>4. Retention and use period of recipients</strong> :<br>
+    The information is retained for the period specified by applicable law and each
+    recipient’s privacy policy and is then destroyed without delay.
+  </p>
+
+  <p class="v2-document-notice">
+    ※ Resident registration numbers and other unique identifiers required for travel
+    insurance are processed by the insurer or through a separate lawful insurance
+    procedure. This online platform does not collect, store, transmit, or display
+    resident registration numbers, masked resident registration numbers, alien
+    registration numbers, or passport numbers.
+  </p>
+
+  <p><br><strong>5. Right to refuse and possible disadvantage</strong><br>
+    You may refuse third-party provision. However, the provision is required for ferry
+    ticketing and travel insurance enrollment, so participation may be restricted if you refuse.
+  </p>
+{% elif document_type == 'safety_pledge' %}
+  <p>I pledge to abide by the following safety rules to maintain the safety and pleasant environment of all participants, including myself, during the visit period according to the safety rules of the tour organized by {{ team.organization_name_en|default:team.organization_name|default:team.name }}.</p><br>
+  <p><strong>1. Means of transportation</strong></p>
+  <p>(1) Vehicle<br>
+    · Seat belts must be worn when boarding the vehicle and seats must not be moved while driving.<br>
+    · Follow instructions from the staff when entering and exiting the vehicle.<br>
+    · You shouldn't drink in the car.<br>
+  </p>
+
+  <p>(2) Ship<br>
+    · Follow the ship's rules and follow the crew's instructions.<br>
+    · In case of emergency, listen to the announcement and act calmly according to the crew's guidance.<br>
+    · Never enter designated off limits.
+  </p><br>
+
+  <p><strong>2. Exploration</strong><br>
+    · Places other than hiking trails are prohibited, and plant collection is also prohibited.<br>
+    · You cannot take items (lighters, matches, gas stoves) that may cause a fire when hiking.<br>
+    · Do not enter breakwaters with a risk of falling and slipping or around the waterfront with wet floors.<br>
+    · Avoid personal behavior and follow the guidance of the staff.
+  </p><br>
+
+  <p><strong>3. Accommodation</strong><br>
+    · Personal belongings and wallets should be kept by themselves so that they are not lost.<br>
+    · It is not allowed to sing loudly or stress others in the accommodation.<br>
+    · Please refrain from leaving the accommodation or personal activities.
+  </p>
+  <p class="v2-document-notice"><strong>※ We will faithfully follow the guidance of our staff and organizers, and we are fully responsible for the damage caused by mental, physical and material safety accidents caused by individual actions outside the organization.</strong></p>
+{% endif %}

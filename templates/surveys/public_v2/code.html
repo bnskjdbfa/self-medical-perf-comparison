@@ -1,0 +1,61 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}v2 코드 입력 Preview{% endblock %}
+{% block messages %}{% endblock %}
+{% block content %}
+<section class="v2-mobile-page v2-code-entry" aria-labelledby="v2-code-title">
+  <nav class="v2-language-switch v2-language-switch--code" aria-label="Language">
+    <a href="{{ language_url_ko }}" class="{% if page_language != 'en' %}is-active{% endif %}" {% if page_language != 'en' %}aria-current="page"{% endif %}>한국어</a>
+    <a href="{{ language_url_en }}" class="{% if page_language == 'en' %}is-active{% endif %}" {% if page_language == 'en' %}aria-current="page"{% endif %}>English</a>
+  </nav>
+  <header class="v2-page-header v2-code-header">
+    <h1 id="v2-code-title">{% if page_language == 'en' %}Tour Program Platform{% else %}탐방 통합 플랫폼{% endif %}</h1>
+    <p>{% if page_language == 'en' %}Enter the information below to use this platform.{% else %}이 플랫폼을 사용하려면 아래 정보를 입력하세요{% endif %}</p>
+  </header>
+
+  {% if messages %}
+  <div class="v2-code-notice" role="status">
+    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  {% if login_reset_required %}
+  <form class="v2-code-form" method="post" action="{% url 'surveys:preview-v2-reset-login' %}">
+    {% csrf_token %}
+    <p role="alert">{% if page_language == 'en' %}Your login could not be verified. Reset it to start again.{% else %}현재 로그인 정보를 확인할 수 없습니다. 초기화한 후 다시 진행해 주세요.{% endif %}</p>
+    <button class="v2-primary-button" type="submit">{% if page_language == 'en' %}Reset login{% else %}로그인 초기화{% endif %}</button>
+  </form>
+  {% else %}
+  <form class="v2-code-form" method="post" action="{% url 'surveys:preview-v2-code' %}" data-login-form novalidate>
+    {% csrf_token %}
+
+    <div class="v2-code-field-group{% if form.team_code.errors %} v2-field--invalid{% endif %}">
+      <img
+        class="v2-code-lock"
+        src="{% static 'surveys/icons/v2-code-lock.svg' %}"
+        width="39"
+        height="48"
+        alt=""
+        aria-hidden="true"
+      />
+      <label for="{{ form.team_code.id_for_label }}">{% if page_language == 'en' %}Access Code{% else %}코드번호{% endif %}</label>
+      <div class="v2-field-control v2-code-input-wrap">
+        {{ form.team_code }}
+      </div>
+      {% if form.team_code.errors %}
+      <div class="public-v2-errors v2-inline-errors v2-code-errors" role="alert">{{ form.team_code.errors }}</div>
+      {% endif %}
+    </div>
+
+    <div class="v2-code-actions">
+      <button class="v2-primary-button" type="submit">Continue</button>
+      <p data-login-status role="status" aria-live="polite"></p>
+      <p class="v2-code-terms">
+        {% if page_language == 'en' %}You will review the privacy notice before entering personal information.{% else %}인적사항 입력 전에 개인정보 수집·이용 동의 내용을 확인합니다.{% endif %}
+      </p>
+    </div>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'surveys/login.js' %}" defer></script>{% endblock %}

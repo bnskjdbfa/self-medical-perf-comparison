@@ -1,0 +1,8 @@
+<h3>&lt; {% if page_language == 'en' and document_ui.document_heading_en %}{{ document_ui.document_heading_en }}{% else %}{{ document_ui.document_heading }}{% endif %} &gt;</h3>
+<div class="v2-document-paper__body">
+  {% if page_language == 'en' %}
+    {% include 'surveys/public_v2/_static_document_body_en.html' with document_type=document_type %}
+  {% else %}
+    {% include 'surveys/public_v2/_static_document_body_ko.html' with document_type=document_type %}
+  {% endif %}
+</div>

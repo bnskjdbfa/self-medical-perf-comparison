@@ -1,0 +1,97 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}v2 인적사항 Preview{% endblock %}
+{% block content %}
+<section class="v2-mobile-page v2-identity" aria-labelledby="v2-identity-title">
+  <header class="v2-page-header v2-identity-header">
+    <h1 id="v2-identity-title">{% if page_language == 'en' %}Tour Program Platform{% else %}탐방 통합 플랫폼{% endif %}</h1>
+    <p>{% if page_language == 'en' %}Enter the information below to use this platform.{% else %}이 플랫폼을 사용하려면 아래 정보를 입력하세요{% endif %}</p>
+  </header>
+
+  <form class="v2-identity-form" method="post" action="{% url 'surveys:preview-v2-identity' %}" data-login-form novalidate>
+    {% csrf_token %}
+
+    <img
+      class="v2-identity-shield"
+      src="{% static 'surveys/icons/v2-identity-shield.svg' %}"
+      width="47"
+      height="56"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="v2-identity-fields">
+      <div class="v2-identity-field{% if form.name.errors or 'name' in mismatched_fields %} v2-field--invalid{% endif %}">
+        <div class="v2-field-control v2-identity-control">
+          <img src="{% static 'surveys/icons/v2-identity-name.svg' %}" width="27" height="22" alt="" aria-hidden="true" />
+          <input
+            id="{{ form.name.id_for_label }}"
+            name="{{ form.name.html_name }}"
+            type="text"
+            value="{{ form.name.value|default_if_none:'' }}"
+            maxlength="50"
+            placeholder="{% if page_language == 'en' %}Name exactly as on your name tag{% else %}명찰의 이름을 그대로 입력{% endif %}"
+            autocomplete="name"
+            aria-label="{% if page_language == 'en' %}Name{% else %}이름{% endif %}"
+            {% if form.name.errors %}aria-invalid="true" aria-describedby="name-error"{% elif 'name' in mismatched_fields %}aria-invalid="true" aria-describedby="identity-form-error"{% endif %}
+            required
+          />
+        </div>
+        {% if form.name.errors %}<div id="name-error" class="v2-inline-errors v2-identity-error" role="alert">{{ form.name.errors }}</div>{% endif %}
+      </div>
+
+      <div class="v2-identity-field{% if form.birth_date.errors or 'birth_date' in mismatched_fields %} v2-field--invalid{% endif %}">
+        <div class="v2-field-control v2-identity-control">
+          <img src="{% static 'surveys/icons/v2-identity-calendar.svg' %}" width="18" height="21" alt="" aria-hidden="true" />
+          <input
+            id="{{ form.birth_date.id_for_label }}"
+            name="{{ form.birth_date.html_name }}"
+            type="text"
+            value="{{ form.birth_date.value|default_if_none:'' }}"
+            maxlength="10"
+            placeholder="{% if page_language == 'en' %}Date of birth / 910722{% else %}생년월일 / 910722{% endif %}"
+            autocomplete="bday"
+            inputmode="numeric"
+            aria-label="{% if page_language == 'en' %}Date of birth{% else %}생년월일{% endif %}"
+            {% if form.birth_date.errors %}aria-invalid="true" aria-describedby="birth-date-error"{% elif 'birth_date' in mismatched_fields %}aria-invalid="true" aria-describedby="identity-form-error"{% endif %}
+            required
+          />
+        </div>
+        {% if form.birth_date.errors %}<div id="birth-date-error" class="v2-inline-errors v2-identity-error" role="alert">{{ form.birth_date.errors }}</div>{% endif %}
+      </div>
+
+      <div class="v2-identity-field{% if form.gender.errors or 'gender' in mismatched_fields %} v2-field--invalid{% endif %}">
+        <div class="v2-field-control v2-identity-control v2-identity-control--select">
+          <img src="{% static 'surveys/icons/v2-identity-gender.svg' %}" width="22" height="22" alt="" aria-hidden="true" />
+          <select
+            id="{{ form.gender.id_for_label }}"
+            name="{{ form.gender.html_name }}"
+            aria-label="{% if page_language == 'en' %}Gender{% else %}성별{% endif %}"
+            {% if form.gender.errors %}aria-invalid="true" aria-describedby="gender-error"{% elif 'gender' in mismatched_fields %}aria-invalid="true" aria-describedby="identity-form-error"{% endif %}
+          >
+            {% with selected_gender=form.gender.value|default_if_none:'' %}
+              {% for value, label in form.gender.field.choices %}
+              <option value="{{ value }}"{% if selected_gender == value %} selected{% endif %}>{% if value %}{% if page_language == 'en' %}{% if value == 'M' %}Male{% else %}Female{% endif %}{% else %}{{ label }}{% endif %}{% else %}{% if page_language == 'en' %}Gender{% else %}성별{% endif %}{% endif %}</option>
+              {% endfor %}
+            {% endwith %}
+          </select>
+        </div>
+        {% if form.gender.errors %}<div id="gender-error" class="v2-inline-errors v2-identity-error" role="alert">{{ form.gender.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    {% if form.non_field_errors %}
+    <div id="identity-form-error" class="v2-inline-errors v2-identity-form-error" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="v2-identity-actions">
+      <button class="v2-primary-button" type="submit">Continue</button>
+      <p data-login-status role="status" aria-live="polite"></p>
+      <p class="v2-identity-terms">
+        {% if page_language == 'en' %}Your information must match the participant list.{% else %}입력 정보는 사전 참가자 명단과 일치해야 합니다.{% endif %}
+      </p>
+    </div>
+  </form>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'surveys/login.js' %}" defer></script>{% endblock %}

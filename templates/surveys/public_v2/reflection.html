@@ -1,0 +1,130 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}소감문 작성{% endblock %}
+{% block content %}
+<section class="v2-reflection" aria-labelledby="v2-reflection-title">
+  <a
+    class="v2-reflection__back"
+    href="{{ home_url }}"
+    aria-label="홈으로 돌아가기"
+    >‹</a
+  >
+
+  <header class="v2-reflection-hero">
+    <div class="v2-reflection-hero__icon" aria-hidden="true">
+      <img
+        src="{% static 'surveys/icons/v2-home/reflection-document.svg' %}"
+        alt=""
+      />
+    </div>
+    <div class="v2-reflection-hero__copy">
+      <p>
+        {% if page_language == 'en' %}Reflection{% else %}소감문 작성{% endif %}
+      </p>
+      <span
+        >{% if page_language == 'en' %}Write about what you felt<br />during the
+        tour program.{% else %}탐방 프로그램 중 느낀점과 소감을<br />작성합니다.{% endif %}</span
+      >
+    </div>
+  </header>
+
+  <div class="v2-reflection-intro">
+    <h1 id="v2-reflection-title">
+      {% if page_language == 'en' %}Start Your Reflection{% else %}소감문 작성을
+      시작합니다{% endif %}
+    </h1>
+    <p>
+      {% if page_language == 'en' %}Feel free to share what you experienced<br />and
+      felt during the tour program.{% else %}탐방 프로그램 동안으로 느꼈던
+      점이나 소감을<br />자유롭게 작성해주시면 됩니다.{% endif %}
+    </p>
+  </div>
+
+  <form
+    class="v2-reflection-form"
+    method="post"
+    action="{% url 'surveys:preview-v2-reflection' %}"
+    novalidate
+  >
+    {% csrf_token %} {% if form.non_field_errors %}
+    <div class="v2-reflection-form__error" role="alert">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div class="v2-reflection-form__row">
+      <div
+        class="v2-reflection-field{% if form.affiliation.errors %} is-invalid{% endif %}"
+      >
+        <label
+          class="v2-reflection-sr-only"
+          for="{{ form.affiliation.id_for_label }}"
+          >소속</label
+        >
+        {{ form.affiliation }} {% for error in form.affiliation.errors %}
+        <p class="v2-reflection-field__error" role="alert">{{ error }}</p>
+        {% endfor %}
+      </div>
+      <div
+        class="v2-reflection-field{% if form.country.errors %} is-invalid{% endif %}"
+      >
+        <label
+          class="v2-reflection-sr-only"
+          for="{{ form.country.id_for_label }}"
+          >국가</label
+        >
+        {{ form.country }} {% for error in form.country.errors %}
+        <p class="v2-reflection-field__error" role="alert">{{ error }}</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div
+      class="v2-reflection-field{% if form.title.errors %} is-invalid{% endif %}"
+    >
+      <label class="v2-reflection-sr-only" for="{{ form.title.id_for_label }}"
+        >제목</label
+      >
+      {{ form.title }} {% for error in form.title.errors %}
+      <p class="v2-reflection-field__error" role="alert">{{ error }}</p>
+      {% endfor %}
+    </div>
+
+    <div
+      class="v2-reflection-field v2-reflection-field--content{% if form.content.errors %} is-invalid{% endif %}"
+    >
+      <label class="v2-reflection-sr-only" for="{{ form.content.id_for_label }}"
+        >소감문 내용</label
+      >
+      {% if team.reflection_image %}
+      <img
+        class="v2-reflection-field__image"
+        src="{{ team.reflection_image.url }}"
+        alt=""
+      />
+      {% endif %} {{ form.content }} {% for error in form.content.errors %}
+      <p class="v2-reflection-field__error" role="alert">{{ error }}</p>
+      {% endfor %}
+      <p class="v2-reflection-field__hint">
+        {% if page_language == 'en' %}Please write at least 10 characters.{% else %}10자 이상 작성해주세요.{% endif %}
+      </p>
+    </div>
+
+    <button class="v2-reflection-form__submit" type="submit">
+      {% if page_language == 'en' %}Complete and Submit{% else %}작성완료 및
+      제출하기{% endif %}
+    </button>
+  </form>
+</section>
+{% if page_language == 'en' %}
+<script>
+  document.getElementById("{{ form.affiliation.id_for_label }}").placeholder =
+    "Affiliation / school";
+  document.getElementById("{{ form.country.id_for_label }}").placeholder =
+    "Country";
+  document.getElementById("{{ form.title.id_for_label }}").placeholder =
+    "Title";
+  document.getElementById("{{ form.content.id_for_label }}").placeholder =
+    "Please write down what you felt during the tour program.";
+</script>
+{% endif %} {% endblock %}

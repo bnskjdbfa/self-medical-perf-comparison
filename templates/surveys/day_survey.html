@@ -1,0 +1,560 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ page_language|default:'ko' }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% if page_language == 'en' %}Day {{ day_no }} Survey{% else %}{{ day_no }}일차 설문{% endif %}</title>
+    <link rel="stylesheet" href="{% static 'prototype/ui.css' %}" />
+    <link rel="stylesheet" href="{% static 'surveys/day_survey.css' %}" />
+    <link rel="stylesheet" href="{% static 'surveys/motion.css' %}" />
+  </head>
+  <body class="survey-page survey-page--{{ section_key }}">
+    <main class="survey-page__shell">
+      <section class="survey-page__frame">
+        <a
+          class="survey-page__back"
+          href="{% url 'surveys:preview-v2-home' %}"
+          aria-label="홈으로 돌아가기"
+        >‹</a>
+
+        <header class="survey-header">
+          <h1 class="survey-header__title" id="survey-section-title">{{ section_title }}</h1>
+          <div class="survey-header__survey-icon" aria-hidden="true">
+            <img src="{% static 'surveys/icons/v2-questionnaire/clipboard.svg' %}" alt="" />
+          </div>
+
+          <div class="survey-header__meta">
+            <button
+              type="button"
+              class="survey-header__nav survey-header__nav--previous"
+              id="survey-header-prev"
+              aria-label="이전 문항"
+            >‹</button>
+            <span class="survey-header__count" id="survey-section-count">{{ section_progress_current }} / {{ section_question_count }} {% if page_language == 'en' %}Questions{% else %}문항{% endif %}</span>
+            <span class="survey-sr-only" id="survey-section-sr">{% if page_language == 'en' %}Question{% else %}문항{% endif %} {{ section_progress_current }} / {{ section_question_count }}</span>
+            <span class="survey-header__label" id="survey-section-label">{{ section_label_ko }}</span>
+            <button
+              type="button"
+              class="survey-header__nav survey-header__nav--next"
+              id="survey-header-next"
+              aria-label="다음 문항"
+            >›</button>
+          </div>
+
+          <div class="survey-progress" aria-hidden="true">
+            <div class="survey-progress__track">
+              <div
+                class="survey-progress__fill"
+                id="survey-progress-fill"
+                style="width: {{ section_progress_percent }}%;"
+              ></div>
+              <span
+                class="survey-progress__thumb"
+                id="survey-progress-thumb"
+                style="left: {{ section_progress_percent }}%;"
+              ></span>
+            </div>
+          </div>
+        </header>
+
+        <form
+          method="post"
+          class="survey-form"
+          id="survey-form"
+          data-storage-key="survey-draft:team-{{ team.id }}:respondent-{{ respondent.id }}:day-{{ day_no }}:form-{{ form.id }}:v{{ form.version }}"
+        >
+          {% csrf_token %}
+          <input type="hidden" name="survey_form_id" value="{{ form.id }}" />
+          <input type="hidden" name="survey_form_version" value="{{ form.version }}" />
+          <input type="hidden" name="survey_form_signature" value="{{ survey_form_signature }}" />
+          <input type="hidden" name="answers_payload" id="survey-answers-payload" value="" />
+
+          <section class="survey-question-card">
+            <ul class="survey-errors" id="survey-errors" {% if not messages %}hidden{% endif %}>
+              {% if messages %}
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+              {% endif %}
+            </ul>
+
+            <fieldset class="survey-fieldset">
+              <legend class="survey-question" id="survey-question-label">{% if page_language == 'en' %}{{ question.label_en|default:question.label }}{% else %}{{ question.label }}{% endif %}</legend>
+
+              <div class="survey-choice-list" id="survey-choice-list">
+                {% if question.question_type == 'single_choice' %}
+                {% for option in current_options %}
+                <label class="survey-choice">
+                  <input
+                    class="survey-choice__input"
+                    type="radio"
+                    name="q_{{ question.id }}"
+                    data-question-id="{{ question.id }}"
+                    value="{{ option.label }}"
+                    {% if current_answer == option.label %}checked{% endif %}
+                  />
+                  <span class="survey-choice__marker" aria-hidden="true"></span>
+                  <span class="survey-choice__label">{% if page_language == 'en' %}{{ option.label_en|default:option.label }}{% else %}{{ option.label }}{% endif %}</span>
+                </label>
+                {% endfor %}
+                {% elif question.question_type == 'multi_choice' %}
+                {% for option in current_options %}
+                <label class="survey-choice">
+                  <input
+                    class="survey-choice__input"
+                    type="checkbox"
+                    name="q_{{ question.id }}"
+                    data-question-id="{{ question.id }}"
+                    value="{{ option.label }}"
+                    {% if current_answer and option.label in current_answer %}checked{% endif %}
+                  />
+                  <span class="survey-choice__marker" aria-hidden="true"></span>
+                  <span class="survey-choice__label">{% if page_language == 'en' %}{{ option.label_en|default:option.label }}{% else %}{{ option.label }}{% endif %}</span>
+                </label>
+                {% endfor %}
+                {% else %}
+                <label class="survey-text-answer">
+                  <span class="survey-text-answer__label">{% if page_language == 'en' %}Enter your answer{% else %}답변 입력{% endif %}</span>
+                  <input
+                    class="survey-text-answer__input"
+                    type="text"
+                    name="q_{{ question.id }}"
+                    data-question-id="{{ question.id }}"
+                    value="{{ current_answer|default:'' }}"
+                  />
+                </label>
+                {% endif %}
+              </div>
+            </fieldset>
+          </section>
+
+          <div id="survey-answer-fields" hidden></div>
+          <div
+            id="survey-actions"
+            class="survey-actions"
+          >
+            <button
+              type="submit"
+              name="prev"
+              id="survey-prev-button"
+              class="survey-button survey-button--ghost"
+              hidden
+            >
+              {% if page_language == 'en' %}Previous{% else %}이전{% endif %}
+            </button>
+            <button
+              type="submit"
+              name="next"
+              id="survey-next-button"
+              class="survey-button survey-button--primary"
+              {% if question_index >= total_questions %}hidden{% endif %}
+            >
+              {% if page_language == 'en' %}Continue{% else %}계속하기{% endif %}
+            </button>
+            <button
+              type="submit"
+              name="submit"
+              id="survey-submit-button"
+              class="survey-button survey-button--primary"
+              {% if question_index < total_questions %}hidden{% endif %}
+            >
+              {% if page_language == 'en' %}Submit{% else %}제출하기{% endif %}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+    {{ survey_questions_payload|json_script:"survey-questions-data" }}
+    {{ initial_answers|json_script:"survey-initial-answers-data" }}
+    <script>
+      (function () {
+        const questions = JSON.parse(document.getElementById('survey-questions-data').textContent);
+        const isEnglish = '{{ page_language|default:"ko"|escapejs }}' === 'en';
+        const initialAnswers = JSON.parse(document.getElementById('survey-initial-answers-data').textContent);
+        const initialIndex = Math.min(Math.max(Number('{{ initial_question_index }}') || 1, 1), questions.length) - 1;
+        const form = document.getElementById('survey-form');
+        const questionCard = form.querySelector('.survey-question-card');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const storageKey = form.dataset.storageKey;
+        const page = document.body;
+        const sectionTitle = document.getElementById('survey-section-title');
+        const sectionCount = document.getElementById('survey-section-count');
+        const sectionSr = document.getElementById('survey-section-sr');
+        const sectionLabel = document.getElementById('survey-section-label');
+        const headerPrevButton = document.getElementById('survey-header-prev');
+        const headerNextButton = document.getElementById('survey-header-next');
+        const progressFill = document.getElementById('survey-progress-fill');
+        const progressThumb = document.getElementById('survey-progress-thumb');
+        const questionLabel = document.getElementById('survey-question-label');
+        const choiceList = document.getElementById('survey-choice-list');
+        const errors = document.getElementById('survey-errors');
+        const answerFields = document.getElementById('survey-answer-fields');
+        const answersPayload = document.getElementById('survey-answers-payload');
+        const actions = document.getElementById('survey-actions');
+        const prevButton = document.getElementById('survey-prev-button');
+        const nextButton = document.getElementById('survey-next-button');
+        const submitButton = document.getElementById('survey-submit-button');
+        let currentIndex = initialIndex;
+        let answers = {};
+        let isSubmitting = false;
+        const questionIds = new Set(questions.map((question) => String(question.id)));
+        const questionsById = new Map(questions.map((question) => [String(question.id), question]));
+
+        function sanitizeAnswer(question, value) {
+          if (question.question_type === 'text') {
+            return String(value || '').trim();
+          }
+          const allowedValues = new Set(question.options.map((option) => option.label));
+          if (question.question_type === 'multi_choice') {
+            const values = Array.isArray(value)
+              ? value
+              : (String(value || '').trim() ? [String(value).trim()] : []);
+            return values.map((item) => String(item).trim()).filter((item) => allowedValues.has(item));
+          }
+          const selectedValue = String(value || '').trim();
+          return allowedValues.has(selectedValue) ? selectedValue : '';
+        }
+
+        function setAnswerFromDraft(question, draftAnswers) {
+          const idKey = String(question.id);
+          if (Object.prototype.hasOwnProperty.call(draftAnswers || {}, idKey)) {
+            answers[idKey] = sanitizeAnswer(question, draftAnswers[idKey]);
+          } else if (Object.prototype.hasOwnProperty.call(draftAnswers || {}, question.key)) {
+            answers[idKey] = sanitizeAnswer(question, draftAnswers[question.key]);
+          }
+        }
+
+        questions.forEach((question) => {
+          setAnswerFromDraft(question, initialAnswers || {});
+        });
+
+        try {
+          const savedDraft = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+          if (savedDraft && savedDraft.answers) {
+            questions.forEach((question) => {
+              setAnswerFromDraft(question, savedDraft.answers);
+            });
+            if (Number.isInteger(savedDraft.currentIndex)) {
+              currentIndex = Math.min(Math.max(savedDraft.currentIndex, 0), questions.length - 1);
+            }
+          }
+        } catch (error) {
+          sessionStorage.removeItem(storageKey);
+        }
+
+        function saveDraft() {
+          const currentAnswers = {};
+          Object.keys(answers).forEach((questionId) => {
+            if (questionIds.has(questionId)) {
+              currentAnswers[questionId] = sanitizeAnswer(questionsById.get(questionId), answers[questionId]);
+            }
+          });
+          sessionStorage.setItem(storageKey, JSON.stringify({ answers: currentAnswers, currentIndex }));
+        }
+
+        function clearErrors() {
+          errors.innerHTML = '';
+          errors.hidden = true;
+        }
+
+        function showError(message) {
+          errors.innerHTML = '';
+          const item = document.createElement('li');
+          item.textContent = message;
+          errors.appendChild(item);
+          errors.hidden = false;
+        }
+
+        function setSubmitting(submitting) {
+          isSubmitting = submitting;
+          submitButton.disabled = submitting;
+          nextButton.disabled = submitting;
+          prevButton.disabled = submitting;
+        }
+
+        function inputName(question) {
+          return `q_${question.id}`;
+        }
+
+        function currentValue(question) {
+          const idKey = String(question.id);
+          if (question.question_type === 'multi_choice') {
+            return Array.isArray(answers[idKey]) ? answers[idKey] : [];
+          }
+          return answers[idKey] || '';
+        }
+
+        function readValueFromControls(question, controls) {
+          if (question.question_type === 'multi_choice') {
+            return Array.from(controls).filter((input) => input.checked || input.type === 'hidden').map((input) => input.value);
+          }
+          if (question.question_type === 'single_choice') {
+            const checked = Array.from(controls).find((input) => input.checked || input.type === 'hidden');
+            return checked ? checked.value : '';
+          }
+          const input = Array.from(controls).find((item) => item.name === inputName(question));
+          return input ? input.value.trim() : '';
+        }
+
+        function readVisibleValue(question) {
+          const name = inputName(question);
+          return sanitizeAnswer(question, readValueFromControls(
+            question,
+            choiceList.querySelectorAll(`[name="${name}"][data-question-id="${question.id}"]`)
+          ));
+        }
+
+        function readMirrorValue(question) {
+          const name = inputName(question);
+          return sanitizeAnswer(question, readValueFromControls(
+            question,
+            answerFields.querySelectorAll(`[name="${name}"][data-question-id="${question.id}"]`)
+          ));
+        }
+
+        function removeMirrorAnswer(question) {
+          answerFields.querySelectorAll(`[name="${inputName(question)}"][data-question-id="${question.id}"]`).forEach((input) => input.remove());
+        }
+
+        function appendMirrorValue(question, value) {
+          const sanitizedValue = sanitizeAnswer(question, value);
+          const name = inputName(question);
+          if (question.question_type === 'multi_choice') {
+            sanitizedValue.forEach((item) => {
+              const input = document.createElement('input');
+              input.type = 'hidden';
+              input.name = name;
+              input.dataset.questionId = String(question.id);
+              input.value = item;
+              answerFields.appendChild(input);
+            });
+            return;
+          }
+          if (String(sanitizedValue || '').trim() === '') {
+            return;
+          }
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.dataset.questionId = String(question.id);
+          input.value = String(sanitizedValue);
+          answerFields.appendChild(input);
+        }
+
+        function syncMirrorFromVisible(question) {
+          removeMirrorAnswer(question);
+          appendMirrorValue(question, readVisibleValue(question));
+        }
+
+        function storeCurrentAnswer() {
+          const question = questions[currentIndex];
+          if (!question) {
+            return;
+          }
+          const idKey = String(question.id);
+          answers[idKey] = readVisibleValue(question);
+          syncMirrorFromVisible(question);
+          saveDraft();
+        }
+
+        function isMissing(question) {
+          const value = answers[String(question.id)];
+          if (!question.is_required) {
+            return false;
+          }
+          if (question.question_type === 'multi_choice') {
+            return !Array.isArray(value) || value.length === 0;
+          }
+          return String(value || '').trim() === '';
+        }
+
+        function bindAnswerEvents() {
+          choiceList.querySelectorAll('input').forEach((input) => {
+            input.addEventListener('input', storeCurrentAnswer);
+            input.addEventListener('change', storeCurrentAnswer);
+          });
+        }
+
+        function renderChoices(question) {
+          choiceList.innerHTML = '';
+          const value = currentValue(question);
+          if (question.question_type === 'text') {
+            const label = document.createElement('label');
+            label.className = 'survey-text-answer';
+            const labelText = document.createElement('span');
+            labelText.className = 'survey-text-answer__label';
+            labelText.textContent = isEnglish ? 'Enter your answer' : '답변 입력';
+            const input = document.createElement('input');
+            input.className = 'survey-text-answer__input';
+            input.type = 'text';
+            input.name = inputName(question);
+            input.dataset.questionId = String(question.id);
+            input.value = value;
+            label.append(labelText, input);
+            choiceList.appendChild(label);
+            return;
+          }
+
+          question.options.forEach((option) => {
+            const label = document.createElement('label');
+            label.className = 'survey-choice';
+            const input = document.createElement('input');
+            input.className = 'survey-choice__input';
+            input.type = question.question_type === 'multi_choice' ? 'checkbox' : 'radio';
+            input.name = inputName(question);
+            input.dataset.questionId = String(question.id);
+            input.value = option.label;
+            input.checked = question.question_type === 'multi_choice'
+              ? Array.isArray(value) && value.includes(option.label)
+              : value === option.label;
+            const marker = document.createElement('span');
+            marker.className = 'survey-choice__marker';
+            marker.setAttribute('aria-hidden', 'true');
+            const choiceLabel = document.createElement('span');
+            choiceLabel.className = 'survey-choice__label';
+            choiceLabel.textContent = option.display_label || option.label;
+            label.append(input, marker, choiceLabel);
+            choiceList.appendChild(label);
+          });
+        }
+
+        function renderQuestion(index) {
+          const nextIndex = Math.min(Math.max(index, 0), questions.length - 1);
+          const direction = nextIndex - currentIndex;
+          currentIndex = nextIndex;
+          const question = questions[currentIndex];
+          page.classList.toggle('survey-page--body', question.section_key === 'body');
+          page.classList.toggle('survey-page--emotion', question.section_key === 'emotion');
+          page.classList.toggle('survey-page--survey', question.section_key === 'survey');
+          sectionTitle.textContent = question.section_title;
+          sectionCount.textContent = `${question.section_progress_current} / ${question.section_question_count} ${isEnglish ? 'Questions' : '문항'}`;
+          sectionSr.textContent = `${isEnglish ? 'Question' : '문항'} ${question.section_progress_current} / ${question.section_question_count}`;
+          sectionLabel.textContent = question.section_label_ko;
+          progressFill.style.width = `${question.section_progress_percent}%`;
+          progressThumb.style.left = `${question.section_progress_percent}%`;
+          questionLabel.textContent = question.label;
+          renderChoices(question);
+          clearErrors();
+          prevButton.hidden = currentIndex === 0;
+          nextButton.hidden = currentIndex === questions.length - 1;
+          submitButton.hidden = currentIndex !== questions.length - 1;
+          headerPrevButton.hidden = currentIndex === 0;
+          headerNextButton.hidden = currentIndex === questions.length - 1;
+          bindAnswerEvents();
+          saveDraft();
+          if (!reduceMotion && direction !== 0) {
+            questionCard.classList.remove('is-entering-forward', 'is-entering-backward');
+            void questionCard.offsetWidth;
+            questionCard.classList.add(
+              direction > 0 ? 'is-entering-forward' : 'is-entering-backward'
+            );
+          }
+        }
+
+        function buildPayloadFromDom() {
+          const payload = {};
+          questions.forEach((question, index) => {
+            const idKey = String(question.id);
+            payload[idKey] = index === currentIndex ? readVisibleValue(question) : readMirrorValue(question);
+          });
+          return payload;
+        }
+
+        function syncHiddenFieldsFromPayload(payload) {
+          answerFields.innerHTML = '';
+          questions.forEach((question, index) => {
+            if (index !== currentIndex) {
+              appendMirrorValue(question, payload[String(question.id)]);
+            }
+          });
+        }
+
+        prevButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          storeCurrentAnswer();
+          renderQuestion(currentIndex - 1);
+        });
+
+        nextButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          storeCurrentAnswer();
+          const question = questions[currentIndex];
+          if (isMissing(question)) {
+            showError(`${isEnglish ? 'Required question' : '필수 문항'}: ${question.label}`);
+            return;
+          }
+          renderQuestion(currentIndex + 1);
+        });
+
+        headerPrevButton.addEventListener('click', () => {
+          prevButton.click();
+        });
+
+        headerNextButton.addEventListener('click', () => {
+          nextButton.click();
+        });
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          if (isSubmitting) {
+            return;
+          }
+          storeCurrentAnswer();
+          const payloadAnswers = buildPayloadFromDom();
+          const missingIndex = questions.findIndex((question) => {
+            const value = payloadAnswers[String(question.id)];
+            if (!question.is_required) {
+              return false;
+            }
+            if (question.question_type === 'multi_choice') {
+              return !Array.isArray(value) || value.length === 0;
+            }
+            return String(value || '').trim() === '';
+          });
+          if (missingIndex >= 0) {
+            renderQuestion(missingIndex);
+            showError(`필수 문항: ${questions[missingIndex].label}`);
+            return;
+          }
+          syncHiddenFieldsFromPayload(payloadAnswers);
+          answersPayload.value = JSON.stringify(payloadAnswers);
+          const formData = new FormData(form);
+          if (!formData.has('submit')) {
+            formData.append('submit', '1');
+          }
+          setSubmitting(true);
+          fetch(form.action || window.location.href, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+          })
+            .then((response) => {
+              return response.json().then((data) => ({ ok: response.ok, data }));
+            })
+            .then(({ ok, data }) => {
+              if (ok && data.redirect_url) {
+                sessionStorage.removeItem(storageKey);
+                window.location.assign(data.redirect_url);
+                return;
+              }
+              setSubmitting(false);
+              if (Number.isInteger(data.question_index)) {
+                renderQuestion(data.question_index - 1);
+              }
+              showError(data.error || '제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+            })
+            .catch(() => {
+              setSubmitting(false);
+              showError('제출 중 오류가 발생했습니다. 네트워크 상태를 확인한 뒤 다시 시도해주세요.');
+            });
+        });
+
+        renderQuestion(currentIndex);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}설문지 작성{% endblock %}
+{% block content %}
+<section class="v2-survey-start" aria-labelledby="v2-survey-start-title">
+  <a class="v2-survey-start__back" href="{{ home_url }}" aria-label="홈으로 돌아가기">‹</a>
+
+  <header class="v2-survey-start-hero">
+    <div class="v2-survey-start-hero__icon" aria-hidden="true">
+      <img src="{% static 'surveys/icons/v2-survey-start/clipboard.svg' %}" alt="" />
+    </div>
+    <div class="v2-survey-start-hero__copy">
+      <p>{% if page_language == 'en' %}Survey{% else %}설문지 작성{% endif %}</p>
+      <span>{% if page_language == 'en' %}Complete the survey to help us<br />improve the tour program.{% else %}보다 나은 탐방 프로그램으로의 개선을 위한<br />설문지를 작성합니다.{% endif %}</span>
+    </div>
+  </header>
+
+  <div class="v2-survey-start-intro">
+    <img
+      class="v2-survey-start-intro__image"
+      src="{% static 'surveys/icons/v2-survey-start/check-pen.png' %}"
+      alt=""
+    />
+    <h1 id="v2-survey-start-title">{% if page_language == 'en' %}Start the Survey{% else %}설문지 작성을 시작합니다{% endif %}</h1>
+  </div>
+
+  <p class="v2-survey-start-notice">
+    {% if page_language == 'en' %}You cannot edit the survey after submitting it.<br />Please review your answers carefully.{% else %}설문지는 작성 완료하면 수정이 불가능하오니<br />충분히 생각하고 답변해주시기 바랍니다.{% endif %}
+  </p>
+
+  <a class="v2-survey-start__button" href="{{ survey_url }}">{% if page_language == 'en' %}Start{% else %}시작하기{% endif %}</a>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">홈</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">{{ original.name }}</a>
+  &rsaquo; 복제
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>
+  <strong>{{ original.name }}</strong> ({{ original.get_form_type_display }} · {{ original.day_no }}일차)의
+  섹션 {{ section_count }}개, 문항 {{ question_count }}개{% if exclusion_count %}, 팀별 제외 문항 {{ exclusion_count }}개{% endif %}를
+  입력한 일차마다 새 공통 설문으로 복사합니다.
+</p>
+<ul>
+  <li>이름은 원본 이름의 "N일차"를 대상 일차로 바꿔 자동으로 짓습니다. 원본 이름에 "일차"가 없으면 뒤에 "(N일차)"를 붙입니다. 복제 후 편집 화면에서 바꿀 수 있습니다.</li>
+  <li>복제본은 원본과 독립적입니다. 원본을 나중에 고쳐도 복제본은 바뀌지 않습니다.</li>
+  <li>복제만 하고 팀 배포는 하지 않습니다. 복제된 설문을 각각 열어 대상 팀에 배포하세요.</li>
+</ul>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="default">복제</button>
+  <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">취소</a>
+</form>
+{% endblock %}

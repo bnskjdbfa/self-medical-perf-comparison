@@ -1,0 +1,104 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}참가자 메인{% endblock %}
+{% block content %}
+<section class="v2-home" aria-labelledby="v2-home-title">
+  <nav class="v2-language-switch" aria-label="Language">
+    <a href="{{ language_url_ko }}" class="{% if page_language != 'en' %}is-active{% endif %}" {% if page_language != 'en' %}aria-current="page"{% endif %}>한국어</a>
+    <a href="{{ language_url_en }}" class="{% if page_language == 'en' %}is-active{% endif %}" {% if page_language == 'en' %}aria-current="page"{% endif %}>English</a>
+  </nav>
+  <form class="v2-home-session-reset" method="post" action="{% url 'surveys:preview-v2-reset-login' %}">
+    {% csrf_token %}
+    <button type="submit">{% if page_language == 'en' %}Reset login information{% else %}로그인 정보 초기화{% endif %}</button>
+  </form>
+  <header class="v2-home-header">
+    <div>
+      <p class="v2-home-greeting">{% if page_language == 'en' %}Welcome!{% else %}안녕하세요!{% endif %}</p>
+      <h1 id="v2-home-title"><strong>{{ respondent.name }}</strong><span>{% if page_language == 'en' %}{% else %}님{% endif %}</span></h1>
+    </div>
+    <div class="v2-home-profile" aria-hidden="true">
+      <span class="v2-home-profile__head"></span>
+      <span class="v2-home-profile__body"></span>
+    </div>
+  </header>
+
+  <div class="v2-home-cards">
+    <!-- 1. 동의서 -->
+    <a class="v2-menu-card v2-menu-card--documents" data-card="required-documents" href="{{ document_url }}">
+      <div class="v2-menu-icon" aria-hidden="true">
+        <img src="{% static 'surveys/icons/v2-home/document.png' %}" alt="" />
+      </div>
+      <div class="v2-menu-copy">
+        <h2>{% if page_language == 'en' %}Consent{% else %}동의서{% endif %}</h2>
+        <p>{{ required_document_progress.completed }} / {{ required_document_progress.total }} {% if page_language == 'en' %}completed{% else %}제출 완료{% endif %}</p>
+      </div>
+      <span class="v2-menu-arrow{% if required_documents_completed %} is-completed{% endif %}" aria-hidden="true">
+        {% if required_documents_completed %}
+          <img src="{% static 'surveys/icons/v2-home/check-documents.svg' %}" alt="" />
+        {% else %}›{% endif %}
+      </span>
+    </a>
+
+    <!-- 2. 자가 검진 -->
+    {% if health_completed or health_available %}
+    <a class="v2-menu-card v2-menu-card--health" data-card="health" href="{{ health_url }}">
+      <div class="v2-menu-icon" aria-hidden="true">
+        <img src="{% static 'surveys/icons/v2-home/health-card.png' %}" alt="" />
+      </div>
+      <div class="v2-menu-copy">
+        <h2>{% if page_language == 'en' %}Health Check{% else %}자가 검진{% endif %}</h2>
+        <p>{% if page_language == 'en' %}{% if health_completed %}View results{% else %}Check your condition<br />and submit it.{% endif %}{% else %}{% if health_completed %}결과 보기{% else %}본인의 컨디션을 체크해<br />제출해주세요.{% endif %}{% endif %}</p>
+      </div>
+      <span class="v2-menu-arrow{% if health_completed %} is-completed{% endif %}" aria-hidden="true">
+        {% if health_completed %}
+          <img src="{% static 'surveys/icons/v2-home/check-health.png' %}" alt="" />
+        {% else %}›{% endif %}
+      </span>
+    </a>
+    {% else %}
+    <div class="v2-menu-card v2-menu-card--health is-unavailable" data-card="health" role="group" aria-disabled="true">
+      <div class="v2-menu-icon" aria-hidden="true">
+        <img src="{% static 'surveys/icons/v2-home/health-card.png' %}" alt="" />
+      </div>
+      <div class="v2-menu-copy">
+        <h2>{% if page_language == 'en' %}Health Check{% else %}자가 검진{% endif %}</h2>
+        <p class="v2-menu-notice" role="status">{{ health_unavailable_message }}</p>
+      </div>
+      <span class="v2-menu-arrow is-unavailable" aria-hidden="true">!</span>
+    </div>
+    {% endif %}
+
+    <!-- 3. 소감문 -->
+    <a class="v2-menu-card v2-menu-card--reflection" data-card="reflection" href="{{ reflection_url }}">
+      <div class="v2-menu-icon" aria-hidden="true">
+        <img src="{% static 'surveys/icons/v2-home/reflection-document.svg' %}" alt="" />
+      </div>
+      <div class="v2-menu-copy">
+        <h2>{% if page_language == 'en' %}Reflection{% else %}소감문{% endif %}</h2>
+        <p>{% if page_language == 'en' %}{% if reflection_completed %}Completed{% else %}Share what you felt<br />during the program.{% endif %}{% else %}{% if reflection_completed %}제출 완료{% else %}이번 탐방에서 느낀 점을<br />간단히 적어주세요.{% endif %}{% endif %}</p>
+      </div>
+      <span class="v2-menu-arrow{% if reflection_completed %} is-completed{% endif %}" aria-hidden="true">
+        {% if reflection_completed %}
+          <img src="{% static 'surveys/icons/v2-home/check-reflection.svg' %}" alt="" />
+        {% else %}›{% endif %}
+      </span>
+    </a>
+
+    <!-- 4. 설문지 -->
+    <a class="v2-menu-card v2-menu-card--survey" data-card="exit-survey" href="{{ exit_survey_url }}">
+      <div class="v2-menu-icon" aria-hidden="true">
+        <img src="{% static 'surveys/icons/v2-home/survey.svg' %}" alt="" />
+      </div>
+      <div class="v2-menu-copy">
+        <h2>{% if page_language == 'en' %}Survey{% else %}설문지{% endif %}</h2>
+        <p>{% if page_language == 'en' %}{% if exit_survey_completed %}Completed{% else %}Please complete the survey<br />about this program.{% endif %}{% else %}{% if exit_survey_completed %}제출 완료{% else %}이번 탐방에 관한 설문을<br />작성해 주세요.{% endif %}{% endif %}</p>
+      </div>
+      <span class="v2-menu-arrow{% if exit_survey_completed %} is-completed{% endif %}" aria-hidden="true">
+        {% if exit_survey_completed %}
+          <img src="{% static 'surveys/icons/v2-home/check-survey.svg' %}" alt="" />
+        {% else %}›{% endif %}
+      </span>
+    </a>
+  </div>
+</section>
+{% endblock %}

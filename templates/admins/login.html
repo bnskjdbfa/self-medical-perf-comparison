@@ -1,0 +1,79 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>관리자 로그인</title>
+    <link rel="stylesheet" href="{% static 'surveys/public_v2.css' %}" />
+    <link rel="stylesheet" href="{% static 'admins/login.css' %}" />
+  </head>
+  <body class="manager-login-body">
+    <main class="manager-login-page">
+      <section class="v2-mobile-page manager-login-shell" aria-labelledby="manager-login-title">
+        <header class="manager-login-header">
+          <h1 id="manager-login-title">탐방 통합 플랫폼</h1>
+        </header>
+
+        <div class="manager-login-key" aria-hidden="true">
+          <img src="{% static 'admins/icons/v2-login-key.svg' %}" width="49" height="63" alt="" />
+        </div>
+
+        <form method="post" class="manager-login-form{% if error_message %} manager-login-form--invalid{% endif %}" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="team_id" value="{{ team.id }}" />
+
+          <div class="manager-login-fields">
+            <label class="v2-field-control manager-login-field">
+              <img src="{% static 'admins/icons/v2-login-user.svg' %}" width="22" height="22" alt="" aria-hidden="true" />
+              <input
+                type="text"
+                name="username"
+                placeholder="ID"
+                value="{{ username_value }}"
+                autocomplete="username"
+                autocapitalize="none"
+                spellcheck="false"
+                aria-label="관리자 아이디"
+                {% if error_message %}aria-invalid="true" aria-describedby="manager-login-error"{% endif %}
+                required
+              />
+            </label>
+
+            <label class="v2-field-control manager-login-field">
+              <img src="{% static 'admins/icons/v2-login-lock.svg' %}" width="18" height="22" alt="" aria-hidden="true" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                aria-label="관리자 비밀번호"
+                {% if error_message %}aria-invalid="true" aria-describedby="manager-login-error"{% endif %}
+                required
+              />
+            </label>
+          </div>
+
+          {% if error_message %}
+          <p id="manager-login-error" class="v2-inline-errors manager-login-error" role="alert">{{ error_message }}</p>
+          {% endif %}
+
+          <div class="manager-login-actions">
+            <button type="submit" class="v2-primary-button manager-login-cta">Continue</button>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script>
+      (function () {
+        const form = document.querySelector(".manager-login-form");
+        const button = document.querySelector(".manager-login-cta");
+        if (!form || !button) return;
+        form.addEventListener("submit", function () {
+          button.disabled = true;
+          button.textContent = "Continue...";
+        });
+      })();
+    </script>
+  </body>
+</html>

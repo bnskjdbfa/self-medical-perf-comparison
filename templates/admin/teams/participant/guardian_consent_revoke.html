@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">홈</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">{{ original.name }}</a>
+  &rsaquo; 동의 확인 취소
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>
+  <strong>{{ original.name }}</strong> ({{ original.team.name }} · {{ original.birth_date|date:"Y-m-d" }})
+</p>
+{% if can_revoke %}
+<p>
+  현재 기록: {{ original.guardian_consent_verified_at|date:"Y-m-d H:i" }}에
+  {{ original.guardian_consent_verified_by|default:"(알 수 없음)" }} 확인 ·
+  {{ original.get_guardian_consent_method_display }} · 버전 {{ original.guardian_consent_document_version }}
+</p>
+<ul>
+  <li>취소하면 이 참가자는 동의를 다시 확인하기 전까지 로그인과 새 제출(자가검진·종료 설문·소감문)이 막힙니다.</li>
+  <li>이미 제출된 기록은 그대로 유지됩니다.</li>
+  <li>확인·취소 이력은 참가자 화면 아래 "법정대리인 동의 이력"에 남습니다.</li>
+</ul>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="default">동의 확인 취소</button>
+  <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">돌아가기</a>
+</form>
+{% else %}
+<p>이 참가자에게는 확인된 법정대리인 동의 기록이 없어 취소할 것이 없습니다.</p>
+<p><a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">돌아가기</a></p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+  {% if original and original.guardian_consent_verified_at %}
+    <li>
+      <a href="{% url 'admin:teams_participant_guardian_consent_revoke' original.pk %}">
+        법정대리인 동의 확인 취소
+      </a>
+    </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

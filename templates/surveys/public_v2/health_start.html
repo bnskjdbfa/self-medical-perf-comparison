@@ -1,0 +1,54 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+{% block title %}{% if page_language == 'en' %}Health Check Survey{% else %}건강상태 확인 설문{% endif %}{% endblock %}
+{% block content %}
+<section class="v2-health-start" aria-labelledby="v2-health-start-title">
+  <a class="v2-health-start__back" href="{{ home_url }}" aria-label="홈으로 돌아가기">‹</a>
+
+  <header class="v2-health-start-hero">
+    <div class="v2-health-start-hero__icon" aria-hidden="true">
+      <img src="{% static 'surveys/icons/v2-health-start/heart.png' %}" alt="" />
+    </div>
+    <div class="v2-health-start-hero__copy">
+      <p>{% if page_language == 'en' %}Health Check Survey{% else %}건강상태 확인 설문{% endif %}</p>
+      <span>{% if page_language == 'en' %}Check your current health status<br />for a safe tour program.{% else %}탐방 프로그램의 안전한 운영을 위해<br />현재 건강 상태를 확인합니다.{% endif %}</span>
+    </div>
+  </header>
+
+  <div class="v2-health-start-intro">
+    <img
+      class="v2-health-start-intro__image"
+      src="{% static 'surveys/icons/v2-health-start/main-illustration.png' %}"
+      alt=""
+    />
+    <h1 id="v2-health-start-title">{% if page_language == 'en' %}Start the Health Check Survey{% else %}건강관리 설문을 시작합니다{% endif %}</h1>
+    <p>{% if page_language == 'en' %}This survey checks your current health status.<br />It takes about 3–5 minutes.{% else %}현재 건강 상태를 정확하게 확인하기 위한 설문입니다.<br />약 3 ~ 5분 정도 소요됩니다.{% endif %}</p>
+  </div>
+
+  <div class="v2-health-start-guide" aria-label="설문 안내">
+    <article>
+      <img src="{% static 'surveys/icons/v2-health-start/shield-plus.png' %}" alt="" />
+      <div>
+        <h2>{% if page_language == 'en' %}A Process for a Safe Tour{% else %}안전한 탐방을 위한 절차{% endif %}</h2>
+        <p>{% if page_language == 'en' %}Checking participants’ health in advance<br />supports safe program operation.{% else %}참여자의 건강 상태를 사전에 확인하여<br />안전한 프로그램 운영을 도와줍니다.{% endif %}</p>
+      </div>
+    </article>
+    <article>
+      <img src="{% static 'surveys/icons/v2-health-start/lock.png' %}" alt="" />
+      <div>
+        <h2>{% if page_language == 'en' %}Your Information Is Protected{% else %}개인정보는 안전하게 보호됩니다{% endif %}</h2>
+        <p>{% if page_language == 'en' %}Collected information is securely managed and deleted<br />after the retention period, and used only for this survey.{% else %}수집된 정보는 안전하게 관리 및 일정기간 후 자동 폐기되며<br />설문 목적외 사용되지 않습니다.{% endif %}</p>
+      </div>
+    </article>
+    <article>
+      <img src="{% static 'surveys/icons/v2-health-start/clock.png' %}" alt="" />
+      <div>
+        <h2>{% if page_language == 'en' %}About 3–5 Minutes{% else %}약 3 ~ 5분 소요{% endif %}</h2>
+        <p>{% if page_language == 'en' %}The questions are simple<br />and easy for anyone to answer.{% else %}간단한 문항으로 구성되어 있으며<br />누구나 쉽게 참여 할 수 있습니다.{% endif %}</p>
+      </div>
+    </article>
+  </div>
+
+  <a class="v2-health-start__button" href="{{ survey_url }}">{% if page_language == 'en' %}Agree and Continue{% else %}동의하고 계속하기{% endif %}</a>
+</section>
+{% endblock %}

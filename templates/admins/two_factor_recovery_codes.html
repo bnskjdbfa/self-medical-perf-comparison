@@ -1,0 +1,10 @@
+{% extends "admins/two_factor_base.html" %}
+{% block title %}복구 코드 보관{% endblock %}
+{% block content %}
+  <h1>복구 코드를 보관해주세요</h1>
+  <p>휴대전화를 사용할 수 없을 때 각 코드를 한 번씩 사용할 수 있습니다. 이 화면을 벗어나면 다시 표시되지 않습니다.</p>
+  <ul class="two-factor-codes">
+    {% for code in codes %}<li><code>{{ code }}</code></li>{% endfor %}
+  </ul>
+  <a class="two-factor-button" href="{{ next }}">저장했습니다</a>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% load static %}
+<section
+  id="{{ result.key }}"
+  class="detail-section detail-section--{{ result.key }}"
+>
+  <header class="detail-section__heading">
+    <img src="{% static icon_path %}" alt="" />
+    <h2>{% if result.key == 'body' %}Health{% else %}Psychology{% endif %}</h2>
+  </header>
+
+  <article class="detail-panel detail-panel--{{ result.key }}">
+    <div class="detail-panel__score">
+      <strong>{{ result.score }}</strong>
+      <span>{{ result.status_label }}</span>
+    </div>
+    <div class="detail-panel__total" aria-label="{% if page_language == 'en' %}Section score {{ result.score }}{% else %}영역 점수 {{ result.score }}점{% endif %}">
+      <span style="width: {{ result.score_percent }}%"></span>
+      <i style="left: {{ result.score_percent }}%"></i>
+    </div>
+
+    <div class="detail-answers">
+      {% for item in result.detail_items %}
+      <article class="detail-answer">
+        <strong class="detail-answer__question">{{ item.question_label }}</strong>
+        {% if item.has_score %}
+        <div class="detail-answer__bar" aria-label="{% if page_language == 'en' %}Score {{ item.score }}{% else %}{{ item.score }}점{% endif %}">
+          <span style="width: {{ item.score }}%"></span>
+          <i style="left: {{ item.score }}%"></i>
+        </div>
+        <span class="result-sr-only">&gt; {{ item.answer_display }}</span>
+        {% else %}
+        <p class="detail-answer__value">&gt; {{ item.answer_display }}</p>
+        {% endif %}
+      </article>
+      {% empty %}
+      <div class="detail-empty">{% if page_language == 'en' %}Not submitted{% else %}제출 전{% endif %}</div>
+      {% endfor %}
+    </div>
+  </article>
+
+  <a class="detail-section__back detail-section__back--{{ result.key }}" href="{{ result_main_url }}">
+    {% if page_language == 'en' %}Back{% else %}돌아가기{% endif %}
+  </a>
+</section>

@@ -1,0 +1,47 @@
+{% extends 'surveys/public_v2/base.html' %}
+{% load static %}
+
+{% block title %}{% if page_language == 'en' %}Privacy Consent{% else %}개인정보 수집·이용 동의{% endif %}{% endblock %}
+
+{% block content %}
+<form class="v2-document-form" method="post" novalidate>
+  {% csrf_token %}
+  <section class="v2-document v2-mobile-page is-active is-ready{% if page_language == 'en' %} v2-document--en{% endif %}">
+    <header class="v2-document-hero">
+      <div class="v2-document-hero__panel">
+        <h1>{% if page_language == 'en' %}{{ document_ui.hero_title_en }}{% else %}{{ document_ui.hero_title }}{% endif %}</h1>
+        <p>{% if page_language == 'en' %}Please review and agree before entering your personal information.{% else %}인적사항을 입력하기 전에 아래 내용을 확인하고 동의해 주세요.{% endif %}</p>
+      </div>
+      <div class="v2-document-hero__icon" aria-hidden="true">
+        <span class="v2-document-icon-stack">
+          <img class="v2-document-icon-shield" src="{% static 'surveys/icons/v2-document-shield.svg' %}" alt="">
+          <img class="v2-document-icon-line v2-document-icon-line--1" src="{% static 'surveys/icons/v2-document-line-1.svg' %}" alt="">
+          <img class="v2-document-icon-line v2-document-icon-line--2" src="{% static 'surveys/icons/v2-document-line-2.svg' %}" alt="">
+          <img class="v2-document-icon-line v2-document-icon-line--3" src="{% static 'surveys/icons/v2-document-line-3.svg' %}" alt="">
+        </span>
+      </div>
+    </header>
+
+    <div class="v2-document-section-title">
+      <span aria-hidden="true"></span>
+      <div>
+        <h2>{% if page_language == 'en' %}{{ document_ui.section_title_en }}{% else %}{{ document_ui.section_title }}{% endif %}</h2>
+      </div>
+    </div>
+
+    <article class="v2-document-paper" tabindex="0">
+      {% include 'surveys/public_v2/_canonical_document.html' with document_type=document_type document_ui=document_ui page_language=page_language %}
+    </article>
+
+    <div class="v2-document-actions">
+      <label class="v2-document-explicit-consent">
+        <input type="checkbox" name="{{ form.agreed.html_name }}" value="on"{% if form.agreed.value %} checked{% endif %} required>
+        <span>{% if page_language == 'en' %}I have reviewed the collection and use of personal information and agree to it. (Required){% else %}개인정보 수집·이용 내용을 확인하였으며 이에 동의합니다. (필수){% endif %}</span>
+      </label>
+      {% if form.agreed.errors %}<div class="v2-inline-errors v2-document-errors" role="alert">{{ form.agreed.errors }}</div>{% endif %}
+      {% if form.non_field_errors %}<div class="v2-inline-errors v2-document-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      <button class="v2-document-submit" type="submit">{% if page_language == 'en' %}Agree and Enter Information{% else %}동의하고 인적사항 입력하기{% endif %}</button>
+    </div>
+  </section>
+</form>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}">{{ original }}</a>
+  &rsaquo; 완전 삭제
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="module">
+    <h2>팀과 연관 데이터를 완전히 삭제합니다</h2>
+    <div style="padding: 16px 20px;">
+      <p>
+        <strong>{{ original }}</strong> 팀을 삭제하면 아래 데이터도 함께 삭제되며 복구할 수 없습니다.
+        운영이 종료된 팀을 화면에서 숨기는 목적이라면 삭제하지 말고 <strong>활성 상태를 해제</strong>하세요.
+      </p>
+
+      <table style="width: 100%; max-width: 720px; margin: 18px 0;">
+        <thead>
+          <tr><th scope="col">삭제 대상</th><th scope="col">건수</th></tr>
+        </thead>
+        <tbody>
+          {% for item in purge_counts %}
+          <tr>
+            <td>{{ item.label }}</td>
+            <td>{{ item.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if global_question_sets_preserved %}
+      <p class="help">
+        전체 공통 질문 세트 원본은 삭제하지 않습니다. 이 팀에 배포된 설문 폼과 배포 이력만 삭제합니다.
+      </p>
+      {% endif %}
+
+      <form method="post" novalidate style="max-width: 720px; margin-top: 24px;">
+        {% csrf_token %}
+        {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+        <div class="form-row">
+          {{ form.team_code.errors }}
+          <div>
+            {{ form.team_code.label_tag }}
+            {{ form.team_code }}
+            {% if form.team_code.help_text %}<div class="help">{{ form.team_code.help_text }}</div>{% endif %}
+          </div>
+        </div>
+        <div class="form-row">
+          {{ form.confirm_purge.errors }}
+          <div>{{ form.confirm_purge }} {{ form.confirm_purge.label_tag }}</div>
+        </div>
+        <div class="submit-row">
+          <input type="submit" value="팀과 연관 데이터 완전 삭제" class="deletelink">
+          <a href="{% url opts|admin_urlname:'change' original.pk|admin_urlquote %}" class="button cancel-link">취소</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

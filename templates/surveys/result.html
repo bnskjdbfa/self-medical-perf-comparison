@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ page_language|default:'ko' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page_language == 'en' %}Survey Results{% else %}설문 결과{% endif %}</title>
+  <link rel="stylesheet" href="{% static 'prototype/ui.css' %}">
+  <link rel="stylesheet" href="{% static 'surveys/result_pages.css' %}">
+  <link rel="stylesheet" href="{% static 'surveys/motion.css' %}">
+</head>
+<body class="result-page result-page--main">
+  <main class="result-shell">
+    <section class="result-frame">
+      <header class="result-header">
+        <h1 class="result-user">{{ respondent.name }}{% if page_language != 'en' %}<span>님</span>{% endif %}</h1>
+        <div class="result-header__copy">
+          <strong>{% if page_language == 'en' %}Health Check{% else %}자가검진{% endif %}</strong>
+          <span>{% if page_language == 'en' %}Check how you feel today{% else %}오늘의 나를 체크해보세요{% endif %}</span>
+        </div>
+      </header>
+
+      <nav class="result-days" aria-label="{% if page_language == 'en' %}Select result day{% else %}결과 일차 선택{% endif %}">
+        <div class="result-days__rail">
+          {% for item in day_tabs %}
+            <a class="result-day{% if item.is_active %} result-day--active{% endif %}" href="{{ item.url }}">{{ item.label }}</a>
+          {% endfor %}
+        </div>
+      </nav>
+
+      <section class="result-card-stack">
+        {% include "surveys/partials/result_summary_card.html" with result=body_result icon_path='surveys/result/icons/body_badge.svg' detail_icon_path='surveys/status/icons/graph-up_green.svg' %}
+        {% include "surveys/partials/result_summary_card.html" with result=emotion_result icon_path='surveys/result/icons/emotion_badge.svg' detail_icon_path='surveys/status/icons/graph-up_purple.svg' %}
+      </section>
+
+      <a class="result-home-button" href="{{ detail_back_url }}">{% if page_language == 'en' %}Return Home{% else %}홈으로 돌아가기{% endif %}</a>
+    </section>
+  </main>
+</body>
+</html>

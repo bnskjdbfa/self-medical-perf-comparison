@@ -1,0 +1,15 @@
+{% extends "admins/two_factor_base.html" %}
+{% block title %}관리자 2단계 인증{% endblock %}
+{% block content %}
+  <h1>2단계 인증</h1>
+  <p>인증 앱의 6자리 코드 또는 보관 중인 복구 코드 하나를 입력해주세요.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    {{ form.non_field_errors }}
+    <label for="{{ form.token.id_for_label }}">{{ form.token.label }}</label>
+    {{ form.token }}
+    {{ form.token.errors }}
+    <button type="submit">확인</button>
+  </form>
+{% endblock %}

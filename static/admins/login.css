@@ -1,0 +1,138 @@
+.manager-login-body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--v2-page-background);
+  color: var(--v2-body-color);
+}
+
+.manager-login-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+}
+
+.manager-login-shell {
+  width: min(100%, var(--v2-mobile-max-width));
+  display: flex;
+  flex-direction: column;
+  padding: calc(117px + env(safe-area-inset-top)) var(--v2-page-gutter)
+    calc(135px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.manager-login-header h1 {
+  margin: 0;
+  color: #51564d;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.24px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.manager-login-key {
+  width: 49px;
+  height: 49px;
+  align-self: center;
+  margin-top: 114px;
+  overflow: visible;
+}
+
+.manager-login-key img {
+  display: block;
+  width: 49px;
+  height: 63px;
+  transform: translateY(-14px);
+  object-fit: fill;
+}
+
+.manager-login-form {
+  min-height: 0;
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-top: 21px;
+}
+
+.manager-login-fields {
+  display: grid;
+  gap: 29px;
+}
+
+.manager-login-field {
+  position: relative;
+  display: block;
+  height: 40px;
+}
+
+.manager-login-field input {
+  height: 40px;
+  padding: 0 42px;
+  border-radius: 15px;
+  background: rgba(230, 230, 230, .2);
+  color: #433a3a;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  text-align-last: center;
+}
+
+.manager-login-field input::placeholder {
+  color: #433a3a;
+  opacity: 1;
+  text-align: center;
+}
+
+.manager-login-field > img {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  top: 50%;
+  display: block;
+  transform: translateY(-50%);
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.manager-login-form--invalid .manager-login-field input {
+  border: 1px solid var(--v2-error-border);
+  background: var(--v2-error-background);
+}
+
+.manager-login-error {
+  position: absolute;
+  top: 116px;
+  right: 0;
+  left: 0;
+  margin: 0;
+}
+
+.manager-login-actions {
+  width: 326px;
+  max-width: 100%;
+  align-self: center;
+  margin-top: auto;
+}
+
+.manager-login-cta:disabled {
+  cursor: default;
+  opacity: .78;
+}
+
+@media (max-height: 760px) {
+  .manager-login-shell {
+    padding-top: calc(72px + env(safe-area-inset-top));
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  .manager-login-key { margin-top: 70px; }
+}
+
+@media (max-width: 360px) {
+  .manager-login-shell { padding-right: 20px; padding-left: 20px; }
+  .manager-login-header h1 { font-size: 22px; }
+}
