@@ -282,10 +282,21 @@ class SessionStore(DBStore):
                     # never retrieve its replacement credential or session.
                     Credential.objects.create(family=family, epoch=0,
                                               session_key=current_key, key_hash=digest(current_key))
-                # The ordinary session row and generation switch commit together.
-                Session.objects.update_or_create(session_key=key, defaults={
-                    'session_data': self.encode(merged), 'expire_date': self.get_expiry_date(),
-                })
+                # The current row was already locked above. A new key must be
+                # inserted, never upserted over an unrelated session on collision.
+                # Avoid update_or_create's redundant lookup and two savepoints;
+                # any failure aborts this whole bounded transaction.
+                values = {'session_data': self.encode(merged),
+                          'expire_date': self.get_expiry_date()}
+                if key == current_key and current_row is not None:
+                    if self.rotating or self.flushed:
+                        raise SessionConflict('session_key_collision')
+                    Session.objects.filter(session_key=key).update(**values)
+                else:
+                    try:
+                        Session.objects.create(session_key=key, **values)
+                    except IntegrityError as exc:
+                        raise SessionConflict('session_key_collision') from exc
                 try:
                     credential = Credential.objects.create(family=family, epoch=family.epoch,
                                                            session_key=key, key_hash=digest(key))
