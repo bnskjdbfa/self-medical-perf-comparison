@@ -15,7 +15,8 @@ import tarfile
 
 ROOT = Path(__file__).resolve().parents[2]
 SERVICE = ('config/db_limits.py', 'config/session_backend.py',
-           'config/session_middleware.py', 'surveys/views.py')
+           'config/session_middleware.py', 'surveys/views.py',
+           'surveys/required_documents.py')
 
 
 def allowed(name):

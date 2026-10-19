@@ -363,3 +363,55 @@ class LoginConcurrencyTest(TestCase):
         client.cookies[settings.SESSION_COOKIE_NAME] = legacy.session_key
         self.assertEqual(client.post(reverse('admins:logout')).status_code, 302)
         self.assertFalse(Session.objects.filter(session_key=legacy.session_key).exists())
+
+    def test_equivalent_session_assignment_emits_no_write_or_cookie(self):
+        from config.session_backend import SessionStore as GuardedStore
+        self.authenticate()
+        request = RequestFactory().get('/')
+        request.COOKIES = {name: value.value for name, value in self.client.cookies.items()
+                           if value.value and str(value['max-age']) != '0'}
+        def view(request):
+            request.session[SESSION_RESPONDENT_ID] = request.session[SESSION_RESPONDENT_ID]
+            return HttpResponse('ok')
+        with patch.object(GuardedStore, 'save', side_effect=AssertionError('unexpected session write')):
+            response = ConcurrentSessionMiddleware(view)(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.cookies)
+
+    def test_expiry_rotation_and_revocation_are_always_dirty(self):
+        from config.session_backend import load_context, SessionStore as GuardedStore
+        self.authenticate()
+        cookies = {name: value.value for name, value in self.client.cookies.items()}
+        context, key = load_context(cookies)
+        store = GuardedStore(key, context=context)
+        self.assertFalse(store.has_changes())
+        store.set_expiry(1234)
+        self.assertTrue(store.has_changes())
+        store.save()
+        self.assertFalse(store.has_changes())
+        store.cycle_key()
+        self.assertTrue(store.has_changes())
+        store.flush()
+        self.assertTrue(store.has_changes())
+
+    def test_home_reads_document_state_once_and_next_request_checks_fresh_policy(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        self.authenticate()
+        self.features.enable_privacy_consent = False
+        self.features.enable_third_party_consent = False
+        self.features.enable_safety_pledge = False
+        self.features.save()
+        home = reverse('surveys:preview-v2-home')
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(home + '?lang=ko')
+        self.assertEqual(response.status_code, 200)
+        for table in ('team_feature_settings', 'document_submissions'):
+            reads = [row for row in captured if row['sql'].lstrip().upper().startswith('SELECT')
+                     and f'"{table}"' in row['sql']]
+            self.assertEqual(len(reads), 1, table)
+        self.features.enable_third_party_consent = True
+        self.features.save()
+        response = self.client.get(home)
+        self.assertRedirects(response, reverse('surveys:preview-v2-documents-next'),
+                             fetch_redirect_response=False)

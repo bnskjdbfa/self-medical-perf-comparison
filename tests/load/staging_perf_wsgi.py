@@ -22,7 +22,8 @@ if len(secret) < 32 or not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', build):
     raise RuntimeError('Set a private measurement token and a safe immutable build identifier.')
 sources = {name: hashlib.sha256((settings.BASE_DIR / name).read_bytes()).hexdigest()
            for name in ('config/db_limits.py', 'config/session_backend.py',
-                        'config/session_middleware.py', 'surveys/views.py')}
+                        'config/session_middleware.py', 'surveys/views.py',
+                        'surveys/required_documents.py')}
 code_digest = hashlib.sha256(json.dumps(sources, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 git_commit = os.environ.get('RENDER_GIT_COMMIT', '')
 git_commit = git_commit if re.fullmatch(r'[a-fA-F0-9]{40,64}', git_commit) else 'unknown'

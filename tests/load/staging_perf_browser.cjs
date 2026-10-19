@@ -2,6 +2,14 @@
 const fs = require('fs');
 const readline = require('readline');
 const {chromium} = require('playwright');
+async function bounded(promise, ms=10000) {
+  let timer;
+  try {
+    return await Promise.race([promise, new Promise((_, reject)=>{
+      timer=setTimeout(()=>reject(new Error('collection_timeout')),ms);
+    })]);
+  } finally {clearTimeout(timer);}
+}
 function arg(name) {return process.argv[process.argv.indexOf(name)+1];}
 function route(path) {
   const prefix='/surveys/preview/v2/';
@@ -35,21 +43,24 @@ function summary(records,key) {
   for(const name of ['--url','--expect-host','--build','--code-digest','--output'])
     if(!process.argv.includes(name))throw Error('Required: --url --expect-host --build --code-digest --output');
   const base=new URL(arg('--url'));
-  if(base.protocol!=='https:'||base.hostname!==arg('--expect-host')||!base.hostname.includes('staging'))
-    throw Error('Use an explicitly confirmed HTTPS staging hostname containing staging.');
+  if(base.protocol!=='https:'||base.hostname!==arg('--expect-host')||
+     !(base.hostname.includes('staging')||base.hostname==='self-medical-perf-comparison.onrender.com'))
+    throw Error('Use only an explicitly confirmed HTTPS staging hostname.');
   if(base.username||base.password||base.search||base.hash)throw Error('Do not put credentials in the URL.');
   const token=process.env.STAGING_PERF_TOKEN;
   if(!token||token.length<32)throw Error('Set STAGING_PERF_TOKEN privately in the environment.');
   const build=arg('--build');
   const digest=arg('--code-digest');
   if(!/^[a-f0-9]{64}$/.test(digest))throw Error('Provide the expected source manifest digest.');
+  if(fs.existsSync(arg('--output')))throw Error('Output exists; preserve it and use a new filename.');
   const report={build,code_digest:digest,scope:'one manual Chrome browser, actual HTTPS staging',requests:[],navigations:[],
     metric_relationship:'session/db-open/driver/query/commit timings overlap; never add them'};
   const browser=await chromium.launch({channel:'chrome',headless:false});
   const tasks=[];
   let mismatches=0;
   let collectionErrors=0;
-  const track=promise=>tasks.push(promise.catch(()=>{collectionErrors++;}));
+  let collecting=true;
+  const track=promise=>tasks.push(bounded(promise).catch(()=>{collectionErrors++;}));
   try {
     const context=await browser.newContext();
     // A host-only secure cookie avoids leaking a header to third-party assets
@@ -58,11 +69,17 @@ function summary(records,key) {
       secure:true,httpOnly:true,sameSite:'Lax'}]);
     const page=await context.newPage();
     page.on('response',response=>{
+      if(!collecting)return;
       const req=response.request();const url=new URL(response.url());const phase=route(url.pathname);
       if(url.origin!==base.origin||!phase)return;
+      // Preserve HTTP status even if a document replacement/aborted response
+      // prevents Playwright from retrieving its body or headers afterwards.
+      const record={route:phase,method:req.method(),resource_type:req.resourceType(),
+        status:response.status(),collection_complete:false};
+      report.requests.push(record);
       track((async()=>{
-        await response.finished();
         const headers=await response.allHeaders();
+        await response.finished();
         const timing=req.timing();
         const server={};
         for(const item of (headers['server-timing']||'').split(',')) {
@@ -71,7 +88,7 @@ function summary(records,key) {
         }
         if(headers['x-perf-build']!==build||headers['x-perf-code-digest']!==digest)mismatches++;
         let redirects=0;for(let parent=req.redirectedFrom();parent;parent=parent.redirectedFrom())redirects++;
-        report.requests.push({route:phase,method:req.method(),resource_type:req.resourceType(),status:response.status(),
+        Object.assign(record,{collection_complete:true,
           start_epoch_ms:timing.startTime,ttfb_ms:timing.responseStart>=0?timing.responseStart:null,
           response_complete_ms:timing.responseEnd>=0?timing.responseEnd:null,
           dns_ms:span(timing.domainLookupStart,timing.domainLookupEnd),
@@ -84,6 +101,7 @@ function summary(records,key) {
       })());
     });
     page.on('load',()=>{
+      if(!collecting)return;
       track((async()=>{
         await page.waitForTimeout(20);
         if(new URL(page.url()).origin!==base.origin)return;
@@ -106,8 +124,17 @@ function summary(records,key) {
     console.log('Use synthetic staging participants only. Complete code → identity/consents → home → survey → result.');
     console.log('Press Enter here after the final page finishes loading. Do not export a HAR.');
     const input=readline.createInterface({input:process.stdin,output:process.stdout});
-    await new Promise(resolve=>input.once('line',resolve));input.close();
-    await page.waitForTimeout(100);
+    let finish;
+    await new Promise(resolve=>{
+      finish=resolve;
+      input.once('line',resolve);
+      input.once('SIGINT',resolve);
+      process.once('SIGINT',resolve);
+    });
+    process.removeListener('SIGINT',finish);
+    input.close();
+    collecting=false;
+    console.log('Saving partial timings; waiting at most 10 seconds for pending collection.');
     await Promise.all(tasks);
     report.build_mismatches=mismatches;
     report.collection_errors=collectionErrors;
@@ -117,7 +144,8 @@ function summary(records,key) {
       .filter(name=>!report.navigations.some(row=>row.route===name));
     report.valid=mismatches===0&&collectionErrors===0&&report.requests.length>0&&report.missing_pages.length===0;
     fs.writeFileSync(arg('--output'),JSON.stringify(report,null,2)+'\n',{mode:0o600});
+    console.log('Report saved: '+arg('--output'));
     if(!report.valid)throw Error('Saved run is invalid: inspect build, page coverage and collection errors.');
     console.log('Saved sanitized one-browser timings. This is not a concurrent-user load test.');
-  } finally {await browser.close();}
+  } finally {await bounded(browser.close(),5000).catch(()=>{});}
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

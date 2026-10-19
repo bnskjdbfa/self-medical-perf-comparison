@@ -306,6 +306,7 @@ def _get_or_create_bundle(
     team: Team,
     respondent: Respondent,
     participant: Participant | None = None,
+    enabled_document_types: list[str] | None = None,
 ) -> RequiredDocumentConsentBundle:
     bundle, _ = RequiredDocumentConsentBundle.objects.get_or_create(
         team=team,
@@ -316,7 +317,10 @@ def _get_or_create_bundle(
                 participant=participant,
             ),
             'team_snapshot_json': build_team_snapshot(team),
-            'enabled_document_types_snapshot': build_enabled_document_types_snapshot(team),
+            'enabled_document_types_snapshot': (
+                build_enabled_document_types_snapshot(team)
+                if enabled_document_types is None else list(enabled_document_types)
+            ),
             'snapshot_schema_version': 2,
             'snapshot_source': RequiredDocumentConsentBundle.SnapshotSource.LIVE_SUBMIT,
         },
@@ -536,6 +540,10 @@ def create_respondent_with_privacy_consent(
                 team=locked_team,
                 respondent=respondent,
                 participant=participant,
+                enabled_document_types=[
+                    kind for kind in REQUIRED_DOCUMENT_ORDER
+                    if getattr(feature_settings, FEATURE_FIELD_BY_DOCUMENT_TYPE[kind], False)
+                ],
             )
             submission = DocumentSubmission.objects.create(
                 team=locked_team,

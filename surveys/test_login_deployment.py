@@ -3,7 +3,9 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.test import Client, RequestFactory, TestCase, override_settings
+from django.test import Client, RequestFactory, TestCase, TransactionTestCase, override_settings
+from django.db import connection, transaction, DatabaseError
+from unittest import skipUnless
 from django.urls import reverse
 from django.utils import timezone
 
@@ -14,6 +16,20 @@ class LoginDeploymentPolicyTest(TestCase):
     setUp = concurrency_tests.LoginConcurrencyTest.setUp
     begin_pre_identity_consent = concurrency_tests.LoginConcurrencyTest.begin_pre_identity_consent
     authenticate = concurrency_tests.LoginConcurrencyTest.authenticate
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL transaction-local settings')
+    def test_nested_database_limits_restore_outer_policy(self):
+        from config.db_limits import bounded_atomic
+        with transaction.atomic():
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT set_config('lock_timeout', '777ms', true), set_config('statement_timeout', '4321ms', true)")
+            with bounded_atomic():
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT current_setting('lock_timeout'), current_setting('statement_timeout')")
+                    self.assertEqual(cursor.fetchone(), ('200ms', '1500ms'))
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT current_setting('lock_timeout'), current_setting('statement_timeout')")
+                self.assertEqual(cursor.fetchone(), ('777ms', '4321ms'))
 
     @override_settings(SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True,
                        SESSION_COOKIE_SAMESITE='Lax', SESSION_COOKIE_PATH='/',
@@ -70,3 +86,25 @@ class LoginDeploymentPolicyTest(TestCase):
         # Gunicorn/proxy must supply the trusted WSGI scheme in this configuration.
         secure = RequestFactory().get('/', secure=True)
         self.assertTrue(secure.is_secure())
+
+
+@skipUnless(connection.vendor == 'postgresql', 'PostgreSQL transaction-local settings')
+class DatabaseLimitTransactionTest(TransactionTestCase):
+    def test_outer_commit_and_timeout_restore_connection_settings(self):
+        from config.db_limits import bounded_atomic
+        def limits():
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT current_setting('lock_timeout'), current_setting('statement_timeout')")
+                return cursor.fetchone()
+        before = limits()
+        self.assertFalse(connection.in_atomic_block)
+        with bounded_atomic():
+            self.assertEqual(limits(), ('200ms', '1500ms'))
+        self.assertEqual(limits(), before)
+        with self.assertRaises(DatabaseError):
+            with override_settings(SESSION_LOCK_TIMEOUT_MS=20, SESSION_STATEMENT_TIMEOUT_MS=50):
+                with bounded_atomic():
+                    with connection.cursor() as cursor:
+                        cursor.execute('SELECT pg_sleep(0.2)')
+        self.assertEqual(limits(), before)
+        self.assertFalse(connection.in_atomic_block)

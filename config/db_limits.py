@@ -40,13 +40,15 @@ def bounded_atomic():
 
 def policy_row(model, **filters):
     """Compatible policy readers; block policy edits, not other participants."""
-    row = model.objects.filter(**filters).first()
-    if row is not None and connection.vendor == 'postgresql':
-        table = connection.ops.quote_name(model._meta.db_table)
-        with connection.cursor() as cursor:
-            cursor.execute(f'SELECT id FROM {table} WHERE id = %s FOR SHARE NOWAIT', [row.pk])
-        row = model.objects.filter(**filters).first()
-    return row
+    queryset = model.objects.filter(**filters).order_by('pk')[:1]
+    if connection.vendor != 'postgresql':
+        return next(iter(queryset), None)
+    # Fetch the policy and acquire its compatible reader lock in one round trip.
+    # Use the ORM compiler for quoting/filter parameters and RawQuerySet for
+    # model field conversion. FOR SHARE prevents updates/deletes until commit;
+    # NOWAIT keeps contention bounded without serializing other policy readers.
+    sql, params = queryset.query.sql_with_params()
+    return next(iter(model.objects.raw(sql + ' FOR SHARE NOWAIT', params)), None)
 
 
 def retryable_database_error(exc):
