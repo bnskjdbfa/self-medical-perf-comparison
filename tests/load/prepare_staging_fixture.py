@@ -84,7 +84,7 @@ def main():
         section = SurveySection.objects.create(form=form, title='Fixture', section_type='physical')
         for index in range(20):
             SurveyQuestion.objects.create(section=section, key=f'q{index}', label=f'Fixture {index}',
-                question_type='single', options_json=['yes','no'], is_required=True)
+                question_type=SurveyQuestion.QuestionType.SINGLE, options_json=['yes','no'], is_required=True)
         Participant.objects.bulk_create([Participant(team=team, name=f'Stage Fixture {i:02d}',
             normalized_name=normalize_name(f'Stage Fixture {i:02d}'), birth_date=date(1990,1,1),
             gender='M', is_active=True) for i in range(1,51)])

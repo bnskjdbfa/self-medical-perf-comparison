@@ -118,7 +118,7 @@ def main():
         form = SurveyForm.objects.create(team=team, day_no=1, title='Performance fixture', version=1)
         section = SurveySection.objects.create(form=form, title='Fixture', section_type='physical')
         questions = [SurveyQuestion.objects.create(section=section, key=f'q{i}', label=f'Fixture {i}',
-                     question_type='single', options_json=['yes', 'no'], is_required=True) for i in range(20)]
+                     question_type=SurveyQuestion.QuestionType.SINGLE, options_json=['yes', 'no'], is_required=True) for i in range(20)]
         indices = [*range(3), *range(100,110), *range(1000,1126), *range(5000,5003)]
         Participant.objects.bulk_create([Participant(team=team, name=f'Performance Fixture {index:04d}',
             normalized_name=normalize_name(f'Performance Fixture {index:04d}'),

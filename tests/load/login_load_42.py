@@ -45,7 +45,7 @@ def run(request):
     form = SurveyForm.objects.create(team=team, day_no=1, title='Fixture', version=1)
     section = SurveySection.objects.create(form=form, title='Fixture', section_type='physical')
     question = SurveyQuestion.objects.create(section=section, key='fixture_question', label='Fixture?',
-                                             question_type='single', options_json=['yes', 'no'], is_required=True)
+                                             question_type=SurveyQuestion.QuestionType.SINGLE, options_json=['yes', 'no'], is_required=True)
     metrics = defaultdict(list)
     lock = threading.Lock()
 
