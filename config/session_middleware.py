@@ -37,7 +37,14 @@ class ConcurrentSessionMiddleware(SessionMiddleware):
     def __call__(self, request):
         request.login_request_id = uuid.uuid4().hex
         try:
-            with bounded_atomic() if connection.vendor == 'postgresql' else nullcontext():
+            has_session_inputs = any(
+                name in {settings.SESSION_COOKIE_NAME, settings.LOGIN_AUTH_COOKIE_NAME}
+                or name.startswith((SCOPE_PREFIX, TOKEN_PREFIX))
+                for name in request.COOKIES
+            )
+            # No credential inputs means load_context performs no DB query.
+            # Avoid opening a transaction solely to discover an empty context.
+            with bounded_atomic() if has_session_inputs and connection.vendor == 'postgresql' else nullcontext():
                 context, key = load_context(request.COOKIES)
             request.session = SessionStore(key, context=context)
             request.login_session_missing = key is None

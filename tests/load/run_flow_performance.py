@@ -65,7 +65,7 @@ def main():
     parser.add_argument('--postgres-port', type=int, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--browser', action='store_true')
-    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread'], default='sync3')
+    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread', 'local-gthread-2x4'], default='sync3')
     args = parser.parse_args()
     root = args.root.resolve()
     import psycopg

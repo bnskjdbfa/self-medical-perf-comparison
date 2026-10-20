@@ -1,0 +1,22 @@
+{
+  "root": "/private/tmp/self-medical-session-write",
+  "scope": "local in-process full identity POST, enforced CSRF; no injected network latency",
+  "status": 200,
+  "sql_count": 26,
+  "sql_kinds": {
+    "transaction_settings": 3,
+    "select_login_session_credentials": 1,
+    "select": 10,
+    "insert": 3,
+    "savepoint": 1,
+    "release": 1,
+    "select_django_session": 2,
+    "select_login_session_families": 1,
+    "insert_django_session": 1,
+    "insert_login_session_credentials": 1,
+    "delete_django_session": 1,
+    "update_login_session_families": 1
+  },
+  "session_saves": 1,
+  "raw_session_values_logged": false
+}

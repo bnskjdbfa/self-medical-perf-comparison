@@ -1,0 +1,1594 @@
+{
+  "label": "queue_reduction_final_2x2",
+  "workers": 2,
+  "server_profile": {
+    "worker_class": "gthread",
+    "workers": 2,
+    "threads": 2,
+    "timeout": 60,
+    "keep_alive": 5,
+    "max_requests": 2000,
+    "max_requests_jitter": 500
+  },
+  "postgres_version": 170006,
+  "max_connections": 20,
+  "fixture_questions": 20,
+  "modes": {
+    "single": {
+      "users": 10,
+      "concurrency": 1,
+      "wall_seconds": 3.313,
+      "journey_ms": {
+        "p50": 367.172,
+        "p95": 439.784
+      },
+      "phases": {
+        "code_get": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 10.432,
+            "p95": 14.936
+          },
+          "total_ms": {
+            "p50": 10.452,
+            "p95": 14.987
+          },
+          "server_ms": {
+            "p50": 9.501,
+            "p95": 13.593
+          },
+          "queries": {
+            "p50": 5.0,
+            "p95": 5.0
+          },
+          "db_ms": {
+            "p50": 3.546,
+            "p95": 5.213
+          },
+          "session_ms": {
+            "p50": 6.421,
+            "p95": 8.984
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "login_session_credentials": 1.0,
+            "login_session_families": 2.0
+          }
+        },
+        "code_post": {
+          "requests": 20,
+          "statuses": {
+            "302": 10,
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 8.122,
+            "p95": 19.522
+          },
+          "total_ms": {
+            "p50": 8.139,
+            "p95": 19.553
+          },
+          "server_ms": {
+            "p50": 7.338,
+            "p95": 18.461
+          },
+          "queries": {
+            "p50": 9.0,
+            "p95": 9.0
+          },
+          "db_ms": {
+            "p50": 3.012,
+            "p95": 8.7
+          },
+          "session_ms": {
+            "p50": 4.797,
+            "p95": 12.608
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.0,
+            "login_session_families": 1.0,
+            "team_feature_settings": 1.0,
+            "teams": 0.5
+          }
+        },
+        "privacy_post": {
+          "requests": 20,
+          "statuses": {
+            "302": 10,
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 11.917,
+            "p95": 19.821
+          },
+          "total_ms": {
+            "p50": 11.943,
+            "p95": 19.894
+          },
+          "server_ms": {
+            "p50": 11.043,
+            "p95": 18.4
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 3.321,
+            "p95": 8.239
+          },
+          "session_ms": {
+            "p50": 5.757,
+            "p95": 14.084
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.0,
+            "login_session_families": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "identity_get": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 9.175,
+            "p95": 14.348
+          },
+          "total_ms": {
+            "p50": 9.191,
+            "p95": 14.369
+          },
+          "server_ms": {
+            "p50": 8.406,
+            "p95": 12.676
+          },
+          "queries": {
+            "p50": 3.0,
+            "p95": 3.0
+          },
+          "db_ms": {
+            "p50": 2.648,
+            "p95": 3.716
+          },
+          "session_ms": {
+            "p50": 4.163,
+            "p95": 6.398
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "identity_post": {
+          "requests": 30,
+          "statuses": {
+            "302": 20,
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 16.86,
+            "p95": 42.736
+          },
+          "total_ms": {
+            "p50": 16.907,
+            "p95": 42.807
+          },
+          "server_ms": {
+            "p50": 15.237,
+            "p95": 41.206
+          },
+          "queries": {
+            "p50": 10.0,
+            "p95": 25.0
+          },
+          "db_ms": {
+            "p50": 6.612,
+            "p95": 21.768
+          },
+          "session_ms": {
+            "p50": 7.205,
+            "p95": 14.914
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.67,
+            "document_submissions": 1.67,
+            "login_session_credentials": 0.33,
+            "login_session_families": 1.33,
+            "participants": 1.0,
+            "required_document_consent_bundles": 0.67,
+            "respondents": 1.0,
+            "team_feature_settings": 1.33,
+            "teams": 0.67
+          }
+        },
+        "documents_get": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 12.839,
+            "p95": 15.918
+          },
+          "total_ms": {
+            "p50": 12.865,
+            "p95": 15.949
+          },
+          "server_ms": {
+            "p50": 11.937,
+            "p95": 14.805
+          },
+          "queries": {
+            "p50": 5.0,
+            "p95": 5.0
+          },
+          "db_ms": {
+            "p50": 4.501,
+            "p95": 6.093
+          },
+          "session_ms": {
+            "p50": 4.143,
+            "p95": 5.956
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "documents_record": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 17.195,
+            "p95": 27.888
+          },
+          "total_ms": {
+            "p50": 17.211,
+            "p95": 27.927
+          },
+          "server_ms": {
+            "p50": 16.183,
+            "p95": 26.572
+          },
+          "queries": {
+            "p50": 10.0,
+            "p95": 10.0
+          },
+          "db_ms": {
+            "p50": 7.04,
+            "p95": 12.802
+          },
+          "session_ms": {
+            "p50": 9.627,
+            "p95": 15.035
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 3.0,
+            "document_submissions": 1.0,
+            "login_session_families": 2.0,
+            "participants": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "documents_finalize": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 44.431,
+            "p95": 46.424
+          },
+          "total_ms": {
+            "p50": 44.477,
+            "p95": 46.467
+          },
+          "server_ms": {
+            "p50": 43.187,
+            "p95": 45.212
+          },
+          "queries": {
+            "p50": 26.0,
+            "p95": 26.0
+          },
+          "db_ms": {
+            "p50": 20.664,
+            "p95": 24.185
+          },
+          "session_ms": {
+            "p50": 17.57,
+            "p95": 20.148
+          },
+          "session_saves": {
+            "p50": 2.0,
+            "p95": 2.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 5.0,
+            "document_submissions": 5.0,
+            "login_session_families": 4.0,
+            "participants": 2.0,
+            "required_document_consent_bundles": 2.0,
+            "respondents": 1.0,
+            "team_feature_settings": 2.0,
+            "teams": 1.0
+          }
+        },
+        "home": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 19.01,
+            "p95": 25.112
+          },
+          "total_ms": {
+            "p50": 19.034,
+            "p95": 25.147
+          },
+          "server_ms": {
+            "p50": 17.485,
+            "p95": 24.051
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 8.062,
+            "p95": 12.116
+          },
+          "session_ms": {
+            "p50": 4.527,
+            "p95": 6.843
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "home_repeat": {
+          "requests": 20,
+          "statuses": {
+            "200": 20
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 17.767,
+            "p95": 22.022
+          },
+          "total_ms": {
+            "p50": 17.797,
+            "p95": 22.049
+          },
+          "server_ms": {
+            "p50": 16.434,
+            "p95": 20.456
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 6.153,
+            "p95": 9.384
+          },
+          "session_ms": {
+            "p50": 4.598,
+            "p95": 6.0
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey_start": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 14.326,
+            "p95": 19.906
+          },
+          "total_ms": {
+            "p50": 14.367,
+            "p95": 19.928
+          },
+          "server_ms": {
+            "p50": 13.039,
+            "p95": 18.868
+          },
+          "queries": {
+            "p50": 6.0,
+            "p95": 6.0
+          },
+          "db_ms": {
+            "p50": 4.879,
+            "p95": 8.2
+          },
+          "session_ms": {
+            "p50": 4.5,
+            "p95": 5.994
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 17.701,
+            "p95": 41.823
+          },
+          "total_ms": {
+            "p50": 17.748,
+            "p95": 41.86
+          },
+          "server_ms": {
+            "p50": 16.618,
+            "p95": 40.887
+          },
+          "queries": {
+            "p50": 6.0,
+            "p95": 6.0
+          },
+          "db_ms": {
+            "p50": 6.475,
+            "p95": 25.852
+          },
+          "session_ms": {
+            "p50": 4.258,
+            "p95": 6.331
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey_submit": {
+          "requests": 20,
+          "statuses": {
+            "302": 10,
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 14.623,
+            "p95": 32.224
+          },
+          "total_ms": {
+            "p50": 14.649,
+            "p95": 32.265
+          },
+          "server_ms": {
+            "p50": 13.81,
+            "p95": 30.966
+          },
+          "queries": {
+            "p50": 11.0,
+            "p95": 11.0
+          },
+          "db_ms": {
+            "p50": 5.722,
+            "p95": 13.967
+          },
+          "session_ms": {
+            "p50": 4.454,
+            "p95": 5.597
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 0.5,
+            "participants": 1.0,
+            "survey_forms": 0.5,
+            "survey_questions": 0.5,
+            "survey_sections": 0.5,
+            "survey_submissions": 1.5,
+            "team_feature_settings": 0.5
+          }
+        },
+        "result": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 11.317,
+            "p95": 17.381
+          },
+          "total_ms": {
+            "p50": 11.34,
+            "p95": 17.401
+          },
+          "server_ms": {
+            "p50": 10.496,
+            "p95": 16.362
+          },
+          "queries": {
+            "p50": 4.0,
+            "p95": 4.0
+          },
+          "db_ms": {
+            "p50": 3.887,
+            "p95": 6.817
+          },
+          "session_ms": {
+            "p50": 3.854,
+            "p95": 6.436
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0
+          }
+        },
+        "retention": {
+          "requests": 10,
+          "statuses": {
+            "200": 10
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 15.327,
+            "p95": 21.503
+          },
+          "total_ms": {
+            "p50": 15.354,
+            "p95": 21.558
+          },
+          "server_ms": {
+            "p50": 14.341,
+            "p95": 20.258
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 6.07,
+            "p95": 8.949
+          },
+          "session_ms": {
+            "p50": 3.683,
+            "p95": 5.581
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        }
+      },
+      "transitions": {
+        "code_get": {
+          "p50_ms": 10.452,
+          "p95_ms": 14.987,
+          "max_redirects": 0
+        },
+        "code_post": {
+          "p50_ms": 23.063,
+          "p95_ms": 31.355,
+          "max_redirects": 1
+        },
+        "privacy_post": {
+          "p50_ms": 22.055,
+          "p95_ms": 34.119,
+          "max_redirects": 1
+        },
+        "identity_get": {
+          "p50_ms": 9.191,
+          "p95_ms": 14.369,
+          "max_redirects": 0
+        },
+        "identity_post": {
+          "p50_ms": 64.988,
+          "p95_ms": 82.811,
+          "max_redirects": 2
+        },
+        "documents_get": {
+          "p50_ms": 12.865,
+          "p95_ms": 15.949,
+          "max_redirects": 0
+        },
+        "documents_record": {
+          "p50_ms": 17.211,
+          "p95_ms": 27.927,
+          "max_redirects": 0
+        },
+        "documents_finalize": {
+          "p50_ms": 44.477,
+          "p95_ms": 46.467,
+          "max_redirects": 0
+        },
+        "home": {
+          "p50_ms": 19.034,
+          "p95_ms": 25.147,
+          "max_redirects": 0
+        },
+        "home_repeat": {
+          "p50_ms": 37.411,
+          "p95_ms": 42.697,
+          "max_redirects": 0
+        },
+        "survey_start": {
+          "p50_ms": 14.367,
+          "p95_ms": 19.928,
+          "max_redirects": 0
+        },
+        "survey": {
+          "p50_ms": 17.748,
+          "p95_ms": 41.86,
+          "max_redirects": 0
+        },
+        "survey_submit": {
+          "p50_ms": 33.42,
+          "p95_ms": 55.458,
+          "max_redirects": 1
+        },
+        "result": {
+          "p50_ms": 11.34,
+          "p95_ms": 17.401,
+          "max_redirects": 0
+        },
+        "retention": {
+          "p50_ms": 15.354,
+          "p95_ms": 21.558,
+          "max_redirects": 0
+        }
+      }
+    },
+    "concurrent42": {
+      "users": 126,
+      "concurrency": 42,
+      "wall_seconds": 7.09,
+      "journey_ms": {
+        "p50": 2250.68,
+        "p95": 2756.174
+      },
+      "phases": {
+        "code_get": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 65.491,
+            "p95": 199.824
+          },
+          "total_ms": {
+            "p50": 65.513,
+            "p95": 199.833
+          },
+          "server_ms": {
+            "p50": 7.43,
+            "p95": 11.207
+          },
+          "queries": {
+            "p50": 5.0,
+            "p95": 5.0
+          },
+          "db_ms": {
+            "p50": 2.83,
+            "p95": 4.588
+          },
+          "session_ms": {
+            "p50": 4.85,
+            "p95": 7.493
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "login_session_credentials": 1.0,
+            "login_session_families": 2.0
+          }
+        },
+        "code_post": {
+          "requests": 252,
+          "statuses": {
+            "302": 126,
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 88.534,
+            "p95": 173.455
+          },
+          "total_ms": {
+            "p50": 88.544,
+            "p95": 173.47
+          },
+          "server_ms": {
+            "p50": 7.269,
+            "p95": 11.726
+          },
+          "queries": {
+            "p50": 9.0,
+            "p95": 9.0
+          },
+          "db_ms": {
+            "p50": 3.347,
+            "p95": 7.19
+          },
+          "session_ms": {
+            "p50": 4.593,
+            "p95": 8.54
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.0,
+            "login_session_families": 1.0,
+            "team_feature_settings": 1.0,
+            "teams": 0.5
+          }
+        },
+        "privacy_post": {
+          "requests": 252,
+          "statuses": {
+            "302": 126,
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 87.682,
+            "p95": 182.727
+          },
+          "total_ms": {
+            "p50": 87.689,
+            "p95": 182.75
+          },
+          "server_ms": {
+            "p50": 7.236,
+            "p95": 11.661
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 3.261,
+            "p95": 6.004
+          },
+          "session_ms": {
+            "p50": 4.919,
+            "p95": 8.881
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.0,
+            "login_session_families": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "identity_get": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 80.757,
+            "p95": 185.499
+          },
+          "total_ms": {
+            "p50": 80.765,
+            "p95": 185.51
+          },
+          "server_ms": {
+            "p50": 5.499,
+            "p95": 7.284
+          },
+          "queries": {
+            "p50": 3.0,
+            "p95": 3.0
+          },
+          "db_ms": {
+            "p50": 1.928,
+            "p95": 3.146
+          },
+          "session_ms": {
+            "p50": 2.821,
+            "p95": 4.126
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "identity_post": {
+          "requests": 378,
+          "statuses": {
+            "302": 252,
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 128.443,
+            "p95": 208.645
+          },
+          "total_ms": {
+            "p50": 128.458,
+            "p95": 208.662
+          },
+          "server_ms": {
+            "p50": 11.276,
+            "p95": 24.081
+          },
+          "queries": {
+            "p50": 10.0,
+            "p95": 25.0
+          },
+          "db_ms": {
+            "p50": 5.924,
+            "p95": 15.284
+          },
+          "session_ms": {
+            "p50": 6.699,
+            "p95": 9.484
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 2.67,
+            "document_submissions": 1.67,
+            "login_session_credentials": 0.33,
+            "login_session_families": 1.33,
+            "participants": 1.0,
+            "required_document_consent_bundles": 0.67,
+            "respondents": 1.0,
+            "team_feature_settings": 1.33,
+            "teams": 0.67
+          }
+        },
+        "documents_get": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 112.187,
+            "p95": 213.899
+          },
+          "total_ms": {
+            "p50": 112.197,
+            "p95": 213.914
+          },
+          "server_ms": {
+            "p50": 7.2,
+            "p95": 9.152
+          },
+          "queries": {
+            "p50": 5.0,
+            "p95": 5.0
+          },
+          "db_ms": {
+            "p50": 2.911,
+            "p95": 4.339
+          },
+          "session_ms": {
+            "p50": 2.752,
+            "p95": 4.175
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "documents_record": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 120.744,
+            "p95": 243.289
+          },
+          "total_ms": {
+            "p50": 120.799,
+            "p95": 243.301
+          },
+          "server_ms": {
+            "p50": 10.973,
+            "p95": 13.039
+          },
+          "queries": {
+            "p50": 10.0,
+            "p95": 10.0
+          },
+          "db_ms": {
+            "p50": 5.677,
+            "p95": 7.427
+          },
+          "session_ms": {
+            "p50": 6.886,
+            "p95": 9.048
+          },
+          "session_saves": {
+            "p50": 1.0,
+            "p95": 1.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 3.0,
+            "document_submissions": 1.0,
+            "login_session_families": 2.0,
+            "participants": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "documents_finalize": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 145.086,
+            "p95": 247.535
+          },
+          "total_ms": {
+            "p50": 145.097,
+            "p95": 247.573
+          },
+          "server_ms": {
+            "p50": 23.73,
+            "p95": 28.012
+          },
+          "queries": {
+            "p50": 26.0,
+            "p95": 26.0
+          },
+          "db_ms": {
+            "p50": 14.296,
+            "p95": 17.086
+          },
+          "session_ms": {
+            "p50": 10.938,
+            "p95": 12.979
+          },
+          "session_saves": {
+            "p50": 2.0,
+            "p95": 2.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 5.0,
+            "document_submissions": 5.0,
+            "login_session_families": 4.0,
+            "participants": 2.0,
+            "required_document_consent_bundles": 2.0,
+            "respondents": 1.0,
+            "team_feature_settings": 2.0,
+            "teams": 1.0
+          }
+        },
+        "home": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 129.503,
+            "p95": 243.699
+          },
+          "total_ms": {
+            "p50": 129.525,
+            "p95": 243.712
+          },
+          "server_ms": {
+            "p50": 9.464,
+            "p95": 11.687
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 4.315,
+            "p95": 5.925
+          },
+          "session_ms": {
+            "p50": 2.659,
+            "p95": 3.871
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "home_repeat": {
+          "requests": 252,
+          "statuses": {
+            "200": 252
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 108.372,
+            "p95": 219.882
+          },
+          "total_ms": {
+            "p50": 108.379,
+            "p95": 219.895
+          },
+          "server_ms": {
+            "p50": 9.713,
+            "p95": 12.257
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 4.588,
+            "p95": 6.329
+          },
+          "session_ms": {
+            "p50": 2.844,
+            "p95": 4.061
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey_start": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 114.545,
+            "p95": 253.93
+          },
+          "total_ms": {
+            "p50": 114.553,
+            "p95": 253.941
+          },
+          "server_ms": {
+            "p50": 8.279,
+            "p95": 11.02
+          },
+          "queries": {
+            "p50": 6.0,
+            "p95": 6.0
+          },
+          "db_ms": {
+            "p50": 3.671,
+            "p95": 5.548
+          },
+          "session_ms": {
+            "p50": 3.043,
+            "p95": 4.286
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 103.227,
+            "p95": 219.47
+          },
+          "total_ms": {
+            "p50": 103.238,
+            "p95": 219.495
+          },
+          "server_ms": {
+            "p50": 8.767,
+            "p95": 11.263
+          },
+          "queries": {
+            "p50": 6.0,
+            "p95": 6.0
+          },
+          "db_ms": {
+            "p50": 3.645,
+            "p95": 5.202
+          },
+          "session_ms": {
+            "p50": 2.85,
+            "p95": 4.329
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        },
+        "survey_submit": {
+          "requests": 252,
+          "statuses": {
+            "302": 126,
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 92.984,
+            "p95": 212.376
+          },
+          "total_ms": {
+            "p50": 93.003,
+            "p95": 212.392
+          },
+          "server_ms": {
+            "p50": 11.607,
+            "p95": 17.109
+          },
+          "queries": {
+            "p50": 11.0,
+            "p95": 11.0
+          },
+          "db_ms": {
+            "p50": 5.242,
+            "p95": 9.34
+          },
+          "session_ms": {
+            "p50": 2.986,
+            "p95": 4.541
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 1,
+            "p95": 1
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 0.5,
+            "participants": 1.0,
+            "survey_forms": 0.5,
+            "survey_questions": 0.5,
+            "survey_sections": 0.5,
+            "survey_submissions": 1.5,
+            "team_feature_settings": 0.5
+          }
+        },
+        "result": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 63.89,
+            "p95": 203.973
+          },
+          "total_ms": {
+            "p50": 63.899,
+            "p95": 203.986
+          },
+          "server_ms": {
+            "p50": 7.063,
+            "p95": 9.42
+          },
+          "queries": {
+            "p50": 4.0,
+            "p95": 4.0
+          },
+          "db_ms": {
+            "p50": 2.658,
+            "p95": 4.244
+          },
+          "session_ms": {
+            "p50": 2.988,
+            "p95": 4.575
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "participants": 1.0,
+            "survey_submissions": 1.0
+          }
+        },
+        "retention": {
+          "requests": 126,
+          "statuses": {
+            "200": 126
+          },
+          "error_rate": 0.0,
+          "ttfb_ms": {
+            "p50": 60.497,
+            "p95": 211.283
+          },
+          "total_ms": {
+            "p50": 60.515,
+            "p95": 211.298
+          },
+          "server_ms": {
+            "p50": 10.27,
+            "p95": 12.834
+          },
+          "queries": {
+            "p50": 8.0,
+            "p95": 8.0
+          },
+          "db_ms": {
+            "p50": 4.828,
+            "p95": 6.715
+          },
+          "session_ms": {
+            "p50": 2.988,
+            "p95": 4.637
+          },
+          "session_saves": {
+            "p50": 0.0,
+            "p95": 0.0
+          },
+          "redirects": {
+            "p50": 0,
+            "p95": 0
+          },
+          "table_queries_per_request": {
+            "django_session": 1.0,
+            "document_submissions": 1.0,
+            "participants": 1.0,
+            "reflection_submissions": 1.0,
+            "survey_forms": 1.0,
+            "survey_submissions": 1.0,
+            "team_feature_settings": 1.0
+          }
+        }
+      },
+      "transitions": {
+        "code_get": {
+          "p50_ms": 65.513,
+          "p95_ms": 199.833,
+          "max_redirects": 0
+        },
+        "code_post": {
+          "p50_ms": 174.529,
+          "p95_ms": 285.645,
+          "max_redirects": 1
+        },
+        "privacy_post": {
+          "p50_ms": 181.568,
+          "p95_ms": 345.847,
+          "max_redirects": 1
+        },
+        "identity_get": {
+          "p50_ms": 80.765,
+          "p95_ms": 185.51,
+          "max_redirects": 0
+        },
+        "identity_post": {
+          "p50_ms": 382.443,
+          "p95_ms": 518.43,
+          "max_redirects": 2
+        },
+        "documents_get": {
+          "p50_ms": 112.197,
+          "p95_ms": 213.914,
+          "max_redirects": 0
+        },
+        "documents_record": {
+          "p50_ms": 120.799,
+          "p95_ms": 243.301,
+          "max_redirects": 0
+        },
+        "documents_finalize": {
+          "p50_ms": 145.097,
+          "p95_ms": 247.573,
+          "max_redirects": 0
+        },
+        "home": {
+          "p50_ms": 129.525,
+          "p95_ms": 243.712,
+          "max_redirects": 0
+        },
+        "home_repeat": {
+          "p50_ms": 228.205,
+          "p95_ms": 407.928,
+          "max_redirects": 0
+        },
+        "survey_start": {
+          "p50_ms": 114.553,
+          "p95_ms": 253.941,
+          "max_redirects": 0
+        },
+        "survey": {
+          "p50_ms": 103.238,
+          "p95_ms": 219.495,
+          "max_redirects": 0
+        },
+        "survey_submit": {
+          "p50_ms": 218.656,
+          "p95_ms": 306.226,
+          "max_redirects": 1
+        },
+        "result": {
+          "p50_ms": 63.899,
+          "p95_ms": 203.986,
+          "max_redirects": 0
+        },
+        "retention": {
+          "p50_ms": 60.515,
+          "p95_ms": 211.298,
+          "max_redirects": 0
+        }
+      }
+    }
+  },
+  "stored_submissions": 139,
+  "lock_samples_10ms": {}
+}

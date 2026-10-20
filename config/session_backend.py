@@ -11,11 +11,12 @@ import uuid
 
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
+from django.contrib.sessions.backends.base import VALID_KEY_CHARS
 from django.contrib.sessions.models import Session
 from django.db import IntegrityError
 from django.db.models import OuterRef, Subquery
 from django.utils import timezone
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import constant_time_compare, salted_hmac, get_random_string
 
 from config.db_limits import bounded_atomic
 
@@ -174,6 +175,12 @@ class SessionStore(DBStore):
             self.original_key = None
         self.baseline = deepcopy(data)
         return data
+
+    def _get_new_session_key(self):
+        # Same CSPRNG, alphabet and length as Django. Uniqueness is enforced by
+        # the atomic INSERT in save(), not a racy SELECT before that INSERT.
+        # A collision fails closed and rolls back the whole generation switch.
+        return get_random_string(32, VALID_KEY_CHARS)
 
     def cycle_key(self):
         self._get_session()

@@ -1,0 +1,300 @@
+{
+  "backend": "django.db.backends.postgresql",
+  "multiworker": "pass",
+  "workers": 2,
+  "server_profile": {
+    "worker_class": "gthread",
+    "workers": 2,
+    "threads": 2,
+    "timeout": 60,
+    "keep_alive": 5,
+    "max_requests": 2000,
+    "max_requests_jitter": 500
+  },
+  "observed_threads_per_worker": [
+    2,
+    2
+  ],
+  "code_posts": 40,
+  "identity_posts": 40,
+  "concurrent_updates": 60,
+  "cookie_matrix": {
+    "reset_old_key_revoked": "pass",
+    "late_reset_response_preserves_new_login": "pass",
+    "logout_old_key_revoked": "pass",
+    "late_logout_response_preserves_new_login": "pass",
+    "late_parallel_branch_cannot_resurrect_after_reset": "pass",
+    "late_legacy_promotion_cannot_erase_new_login": "pass",
+    "reset_during_key_rotation_cannot_resurrect": "pass"
+  },
+  "effective_transaction_limits": {
+    "lock_timeout": "200ms",
+    "statement_timeout": "1500ms"
+  },
+  "postgres_version": "17.6",
+  "database_limits": {
+    "lock_timeout": "0",
+    "statement_timeout": "0",
+    "idle_in_transaction_session_timeout": "0",
+    "transaction_timeout": "0",
+    "max_connections": "20"
+  },
+  "lock_contention": {
+    "busy_statuses": [
+      503,
+      503,
+      503,
+      503
+    ],
+    "observed_hold_seconds": 0.155,
+    "unrelated_delay_seconds": 0.153,
+    "deployment_gate": "pass"
+  },
+  "slow_view": {
+    "same_session_delay_seconds": 0.034,
+    "idle_in_transaction_observed": false,
+    "deployment_gate": "pass"
+  },
+  "statement_timeout": {
+    "status": 503,
+    "cookie_changed": false,
+    "elapsed_seconds": 0.114,
+    "login_retained": true
+  },
+  "query_error": {
+    "status": 503,
+    "cookie_changed": false,
+    "subsequent_login_valid": true
+  },
+  "connection_exhaustion": {
+    "statuses": [
+      503,
+      503,
+      503,
+      503
+    ],
+    "cookie_changed": false,
+    "elapsed_seconds": 0.013,
+    "recovered_login_valid": true
+  },
+  "remaining_worker_transactions": 0,
+  "load42": {
+    "users": 42,
+    "duplicates_per_user": 3,
+    "logical_failures": 0,
+    "single_login_wall_seconds": 0.575,
+    "single_login_retained_users": 42,
+    "login_wall_seconds": 0.481,
+    "retained_users": 42,
+    "document_rows": 126,
+    "health_submission_rows": 42,
+    "phases": {
+      "single_bootstrap": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 63.0,
+        "p95_ms": 91.8,
+        "max_ms": 98.9,
+        "raw_5xx_rate": 0.0
+      },
+      "single_code": {
+        "requests": 42,
+        "statuses": {
+          "302": 42
+        },
+        "p50_ms": 89.3,
+        "p95_ms": 130.8,
+        "max_ms": 138.3,
+        "raw_5xx_rate": 0.0
+      },
+      "single_privacy": {
+        "requests": 42,
+        "statuses": {
+          "302": 42
+        },
+        "p50_ms": 135.3,
+        "p95_ms": 165.4,
+        "max_ms": 170.7,
+        "raw_5xx_rate": 0.0
+      },
+      "single_identity": {
+        "requests": 42,
+        "statuses": {
+          "302": 42
+        },
+        "p50_ms": 150.3,
+        "p95_ms": 207.0,
+        "max_ms": 210.5,
+        "raw_5xx_rate": 0.0
+      },
+      "single_retention": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 55.2,
+        "p95_ms": 72.1,
+        "max_ms": 74.4,
+        "raw_5xx_rate": 0.0
+      },
+      "bootstrap": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 67.8,
+        "p95_ms": 104.8,
+        "max_ms": 110.2,
+        "raw_5xx_rate": 0.0
+      },
+      "code": {
+        "requests": 140,
+        "statuses": {
+          "503": 14,
+          "302": 126
+        },
+        "p50_ms": 84.7,
+        "p95_ms": 117.3,
+        "max_ms": 138.8,
+        "raw_5xx_rate": 0.1
+      },
+      "privacy": {
+        "requests": 42,
+        "statuses": {
+          "302": 42
+        },
+        "p50_ms": 82.6,
+        "p95_ms": 149.0,
+        "max_ms": 151.7,
+        "raw_5xx_rate": 0.0
+      },
+      "identity": {
+        "requests": 142,
+        "statuses": {
+          "503": 16,
+          "302": 42,
+          "409": 84
+        },
+        "p50_ms": 125.9,
+        "p95_ms": 173.6,
+        "max_ms": 186.4,
+        "raw_5xx_rate": 0.1127
+      },
+      "retention_after_login": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 55.5,
+        "p95_ms": 77.6,
+        "max_ms": 80.0,
+        "raw_5xx_rate": 0.0
+      },
+      "required_gate": {
+        "requests": 42,
+        "statuses": {
+          "302": 42
+        },
+        "p50_ms": 76.4,
+        "p95_ms": 117.9,
+        "max_ms": 122.4,
+        "raw_5xx_rate": 0.0
+      },
+      "document_page": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 99.8,
+        "p95_ms": 154.7,
+        "max_ms": 158.6,
+        "raw_5xx_rate": 0.0
+      },
+      "document_record": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 104.5,
+        "p95_ms": 154.6,
+        "max_ms": 161.3,
+        "raw_5xx_rate": 0.0
+      },
+      "document_finalize": {
+        "requests": 160,
+        "statuses": {
+          "200": 47,
+          "302": 79,
+          "409": 13,
+          "503": 21
+        },
+        "p50_ms": 136.9,
+        "p95_ms": 180.7,
+        "max_ms": 212.9,
+        "raw_5xx_rate": 0.1313
+      },
+      "health_start": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 82.8,
+        "p95_ms": 131.3,
+        "max_ms": 140.8,
+        "raw_5xx_rate": 0.0
+      },
+      "health_page": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 96.4,
+        "p95_ms": 160.8,
+        "max_ms": 165.2,
+        "raw_5xx_rate": 0.0
+      },
+      "health_submit": {
+        "requests": 128,
+        "statuses": {
+          "302": 126,
+          "503": 2
+        },
+        "p50_ms": 120.3,
+        "p95_ms": 154.3,
+        "max_ms": 182.6,
+        "raw_5xx_rate": 0.0156
+      },
+      "retention_after_submission": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 62.5,
+        "p95_ms": 85.4,
+        "max_ms": 88.5,
+        "raw_5xx_rate": 0.0
+      },
+      "home_after_submission": {
+        "requests": 42,
+        "statuses": {
+          "200": 42
+        },
+        "p50_ms": 96.4,
+        "p95_ms": 145.4,
+        "max_ms": 152.3,
+        "raw_5xx_rate": 0.0
+      }
+    },
+    "status": "pass"
+  },
+  "browser": "pass",
+  "django_regression": {
+    "status": "pass",
+    "count": 113,
+    "failed_tests": [],
+    "exception_types": [],
+    "test_database_charset": "UTF8"
+  }
+}

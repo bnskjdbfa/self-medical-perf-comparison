@@ -74,7 +74,7 @@ def main():
     parser.add_argument('--django-tests', action='store_true', help='Run login/consent/policy tests on the isolated backend.')
     parser.add_argument('--users42', action='store_true', help='42 distinct synthetic participants, three submissions each.')
     parser.add_argument('--report', type=Path, help='Write sanitized JSON results (no cookies or input).')
-    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread'], default='sync3')
+    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread', 'local-gthread-2x4'], default='sync3')
     args = parser.parse_args()
     with tempfile.TemporaryDirectory(prefix='login-race-') as temp, isolated_database(temp, args.postgres_port) as db_env:
         os.environ.update({
@@ -228,6 +228,7 @@ def main():
                     checks = subprocess.run([
                         sys.executable, 'manage.py', 'test', 'surveys.test_login_concurrency',
                         'surveys.test_login_deployment', 'surveys.tests.RequiredDocumentFlowTest',
+                        'surveys.test_session_rotation_writes', 'surveys.test_identity_round_trips',
                         '--verbosity', '0',
                     ], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                         env={**os.environ, 'DJANGO_SETTINGS_MODULE': 'login_test_settings',

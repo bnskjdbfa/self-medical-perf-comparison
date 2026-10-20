@@ -116,3 +116,52 @@ class SessionRotationWriteTest(TestCase):
                 store.save(finalizing=True)
         self.assertFalse(Session.objects.filter(session_key=candidate).exists())
         self.assertEqual(self.reload(cookies)['fixture_marker'], 'original')
+
+    def test_candidate_generation_does_not_query_database(self):
+        store = self.create_store('original')
+        with self.assertNumQueries(0):
+            store.cycle_key()
+        self.assertEqual(len(store.session_key), 32)
+        self.assertRegex(store.session_key, r'^[a-z0-9]{32}$')
+        self.assertNotEqual(store.session_key, store.original_key)
+
+    def test_anonymous_candidate_collision_preserves_other_family(self):
+        other = self.create_store('existing')
+        fresh = SessionStore()
+        fresh['fixture_marker'] = 'must-rollback'
+        from surveys.models import LoginSessionFamily
+        count = LoginSessionFamily.objects.count()
+        with patch.object(fresh, '_get_new_session_key', return_value=other.session_key):
+            with self.assertRaisesRegex(SessionConflict, '^session_key_collision$'):
+                fresh.save(finalizing=True)
+        self.assertEqual(LoginSessionFamily.objects.count(), count)
+        self.assertEqual(self.reload(self.cookies(other))['fixture_marker'], 'existing')
+
+    def test_cookie_free_request_skips_session_read_transaction(self):
+        from django.http import HttpResponse
+        from django.test import RequestFactory
+        from config.session_middleware import ConcurrentSessionMiddleware
+        for cookies in ({}, {'csrftoken': 'fixture-csrf'}):
+            request = RequestFactory().get('/fixture/')
+            request.COOKIES.update(cookies)
+            with patch('config.session_middleware.bounded_atomic', side_effect=AssertionError('unexpected transaction')):
+                with self.assertNumQueries(0):
+                    response = ConcurrentSessionMiddleware(lambda req: HttpResponse('ok'))(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(response.cookies)
+
+    def test_session_cookie_inputs_keep_bounded_read(self):
+        from django.conf import settings
+        from django.http import HttpResponse
+        from django.test import RequestFactory
+        from contextlib import nullcontext
+        from config.session_middleware import ConcurrentSessionMiddleware
+        for name in (settings.SESSION_COOKIE_NAME, settings.LOGIN_AUTH_COOKIE_NAME,
+                     SCOPE_PREFIX + 'malformed', TOKEN_PREFIX + 'malformed'):
+            request = RequestFactory().get('/fixture/')
+            request.COOKIES[name] = 'fixture'
+            with patch('config.session_middleware.connection') as conn, patch('config.session_middleware.bounded_atomic', return_value=nullcontext()) as bounded:
+                conn.vendor = 'postgresql'
+                response = ConcurrentSessionMiddleware(lambda req: HttpResponse('ok'))(request)
+            bounded.assert_called_once_with()
+            self.assertEqual(response.status_code, 200)
