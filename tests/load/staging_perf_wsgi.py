@@ -49,6 +49,7 @@ def application(environ, start_response):
     measurement = Measurement()
     token = active.set(measurement)
     request_id = uuid.uuid4().hex
+    measurement.request_id = request_id
     started = time.perf_counter()
     captured = []
     try:

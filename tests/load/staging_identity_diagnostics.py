@@ -38,7 +38,8 @@ def describe_error(exc):
                     # Observed after rollback/unwinding: NOT the precise throw time.
                     'elapsed_ms_at_observation': round((time.monotonic() - started) * 1000, 3)
                     if isinstance(started, (float, int)) else None})
-            elif module in {'surveys.required_documents', 'surveys.views', 'teams.services'}:
+            elif module in {'surveys.required_documents', 'surveys.views', 'teams.services',
+                            'config.session_backend', 'config.session_middleware'}:
                 points.append({'module': module, 'function': function, 'line': tb.tb_lineno})
             tb = tb.tb_next
         item['points'] = points[-8:]
@@ -62,23 +63,29 @@ def install():
         original(request, reason)
         measurement = active.get()
         exc = sys.exc_info()[1]
-        if measurement is None or reason != 'identity_database_busy' or exc is None:
+        if measurement is None or reason not in {
+                'identity_database_busy', 'session_database_busy', 'database_busy'} or exc is None:
             return
         # Reporting must never affect exception handling or authentication.
         try:
-            print(json.dumps({'event': 'staging_identity_database_error',
+            print(json.dumps({'event': ('staging_identity_database_error'
+                if reason == 'identity_database_busy' else 'staging_session_database_error'),
                 'worker': os.getpid(),
                 'build': os.environ.get('RENDER_GIT_COMMIT', '')
                 if re.fullmatch(r'[a-fA-F0-9]{40,64}', os.environ.get('RENDER_GIT_COMMIT', '')) else 'unknown',
                 'login_request_id': request.login_request_id,
-                'reason': 'identity_database_busy',
+                'perf_request_id': getattr(measurement, 'request_id', None),
+                'reason': reason,
                 'lock_limit_ms': settings.SESSION_LOCK_TIMEOUT_MS,
                 'statement_and_wall_budget_ms': settings.SESSION_STATEMENT_TIMEOUT_MS,
                 'sql_count_at_observation': measurement.values['sql_count'],
                 'query_ms_at_observation': round(measurement.values['query_ms'], 3),
                 'exception_chain': describe_error(exc)}), flush=True)
         except Exception:
-            print('{"event":"staging_identity_diagnostic_failed"}', flush=True)
+            try:
+                print('{"event":"staging_identity_diagnostic_failed"}', flush=True)
+            except Exception:
+                pass  # Broken logging must not change authentication responses.
 
     diagnostic_event._identity_diagnostics = True
     views.login_event = diagnostic_event
