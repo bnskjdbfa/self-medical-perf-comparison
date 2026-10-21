@@ -74,7 +74,7 @@ def main():
     parser.add_argument('--django-tests', action='store_true', help='Run login/consent/policy tests on the isolated backend.')
     parser.add_argument('--users42', action='store_true', help='42 distinct synthetic participants, three submissions each.')
     parser.add_argument('--report', type=Path, help='Write sanitized JSON results (no cookies or input).')
-    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread', 'local-gthread-2x4'], default='sync3')
+    parser.add_argument('--server-profile', choices=['sync3', 'production-gthread', 'local-gthread-2x4', 'local-gthread-2x4-no-keepalive', 'local-gthread-2x6-no-keepalive', 'local-gthread-2x8-no-keepalive'], default='sync3')
     args = parser.parse_args()
     with tempfile.TemporaryDirectory(prefix='login-race-') as temp, isolated_database(temp, args.postgres_port) as db_env:
         os.environ.update({
@@ -176,20 +176,29 @@ def main():
                 else:
                     raise RuntimeError('Local test server readiness timeout.')
 
+                expected = profile(args.server_profile)
+                burst = max(8, expected['workers']*expected['threads'])
+                if expected['threads'] > 4:
+                    # Observe all lazily created pool threads before asserting
+                    # capacity; static probes do not open DB connections.
+                    probe_count=max(42,burst*4)
+                    with ThreadPoolExecutor(max_workers=probe_count) as pool:
+                        probes=list(pool.map(lambda _:request('/static/surveys/public_v2.css',delay=.15),range(probe_count)))
+                    assert all(r[0]==200 for r in probes), 'thread_capacity_probe_failed'
                 for _ in range(5):
                     cookies = request(CODE)[2]
-                    with ThreadPoolExecutor(max_workers=8) as pool:
+                    with ThreadPoolExecutor(max_workers=burst) as pool:
                         code_results = list(pool.map(
-                            lambda _: retry_request(CODE, cookies, {'team_code': 'LOGIN-RACE'}), range(8)))
+                            lambda _: retry_request(CODE, cookies, {'team_code': 'LOGIN-RACE'}), range(burst)))
                     assert all(result[0] == 302 for result in code_results), [r[0] for r in code_results]
                     for result in code_results:
                         cookies.update(result[2])
                     prelogin = dict(cookies)
                     payload = {'name': 'Race Fixture', 'birth_date': '900101', 'gender': 'M'}
-                    with ThreadPoolExecutor(max_workers=8) as pool:
+                    with ThreadPoolExecutor(max_workers=burst) as pool:
                         identity_results = list(pool.map(
-                            lambda _: retry_request(IDENTITY, prelogin, payload), range(8)))
-                    assert sorted(result[0] for result in identity_results) == [302] + [409] * 7
+                            lambda _: retry_request(IDENTITY, prelogin, payload), range(burst)))
+                    assert sorted(result[0] for result in identity_results) == [302] + [409] * (burst-1)
                     success = next(result for result in identity_results if result[0] == 302)
                     cookies.update(success[2])
                     assert cookies.get('authenticated_sessionid')
@@ -209,11 +218,11 @@ def main():
                 assert len(workers) == expected['workers']
                 observed_threads = sorted(sum(worker == owner for owner, thread in worker_threads) for worker in workers)
                 if expected['worker_class'] == 'gthread':
-                    assert observed_threads == [2, 2], observed_threads
-                print('PASS HTTP: ' + args.server_profile + '; 5 rounds; 40 code + 40 identity submissions; 60 concurrent session updates; late responses preserve login')
+                    assert observed_threads == [expected['threads']] * expected['workers'], observed_threads
+                print('PASS HTTP: ' + args.server_profile + f'; 5 rounds; {5*burst} code + {5*burst} identity submissions; 60 concurrent session updates; late responses preserve login')
                 report = {'backend': db_env['DB_ENGINE'], 'multiworker': 'pass', 'workers': len(workers),
                           'server_profile': expected, 'observed_threads_per_worker': observed_threads,
-                          'code_posts': 40, 'identity_posts': 40, 'concurrent_updates': 60}
+                          'code_posts': 5*burst, 'identity_posts': 5*burst, 'concurrent_updates': 60}
                 if args.predeploy:
                     from login_predeploy_checks import run_checks
                     report.update(run_checks(request, db_env, capacity=expected['workers'] * expected['threads']))
@@ -229,6 +238,7 @@ def main():
                         sys.executable, 'manage.py', 'test', 'surveys.test_login_concurrency',
                         'surveys.test_login_deployment', 'surveys.tests.RequiredDocumentFlowTest',
                         'surveys.test_session_rotation_writes', 'surveys.test_identity_round_trips',
+                        'surveys.test_session_duplicate_writes',
                         '--verbosity', '0',
                     ], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                         env={**os.environ, 'DJANGO_SETTINGS_MODULE': 'login_test_settings',

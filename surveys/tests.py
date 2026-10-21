@@ -5754,7 +5754,8 @@ class RequiredDocumentConsentEvidenceTest(TestCase):
         request = RequestFactory().get('/admin/surveys/documentsubmission/')
         request.user = staff
         admin_instance = DocumentSubmissionAdmin(DocumentSubmission, AdminSite())
-        self.assertEqual(list(admin_instance.get_queryset(request)), list(DocumentSubmission.objects.order_by('id')))
+        # This assertion checks permission scope, not unspecified DB row order.
+        self.assertCountEqual(admin_instance.get_queryset(request), DocumentSubmission.objects.all())
         self.assertTrue(admin_instance.has_view_permission(request, submission))
         self.assertFalse(admin_instance.has_add_permission(request))
         self.assertFalse(admin_instance.has_change_permission(request, submission))

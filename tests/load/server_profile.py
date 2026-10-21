@@ -8,6 +8,10 @@ def profile(name):
                 'keep_alive': 5, 'max_requests': 2000, 'max_requests_jitter': 500}
     if name == 'local-gthread-2x4':
         return {**profile('production-gthread'), 'threads': 4}
+    if name == 'local-gthread-2x4-no-keepalive':
+        return {**profile('local-gthread-2x4'), 'keep_alive': 0}
+    if name in {'local-gthread-2x6-no-keepalive', 'local-gthread-2x8-no-keepalive'}:
+        return {**profile('local-gthread-2x4-no-keepalive'), 'threads': 6 if '2x6' in name else 8}
     if name == 'sync3':
         return {'worker_class': 'sync', 'workers': 3, 'threads': 1, 'timeout': 30,
                 'keep_alive': 2, 'max_requests': 0, 'max_requests_jitter': 0}

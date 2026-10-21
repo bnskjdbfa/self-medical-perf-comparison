@@ -828,7 +828,10 @@ def day_survey_view(request: HttpRequest, day_no: int) -> HttpResponse:
 
         if current_question.is_required and is_empty:
             messages.error(request, f'필수 문항: {current_question.label}')
-        else:
+        elif 'submit' not in request.POST:
+            # Final submission is validated from the complete DOM payload below.
+            # Do not create a one-question draft that duplicate INSERT handling
+            # would otherwise persist after a successful concurrent submission.
             draft_answers[current_question.key] = current_value
             request.session['survey_answers_draft'] = draft_answers
             if 'next' in request.POST and question_index < total_questions:
@@ -878,6 +881,7 @@ def day_survey_view(request: HttpRequest, day_no: int) -> HttpResponse:
                         submitted_at=timezone.now(),
                     )
             except IntegrityError:
+                request.session.pop('survey_answers_draft', None)
                 redirect_url = v2_health_completion_url
                 if is_async_request:
                     return JsonResponse({'redirect_url': redirect_url})

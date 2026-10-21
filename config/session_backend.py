@@ -213,6 +213,13 @@ class SessionStore(DBStore):
         ctx = self.context
         if ctx.stale and not self.flushed:
             raise SessionConflict('retired_session')
+        # Middleware already skips equivalent assignments. Explicit view saves
+        # should do the same for a loaded generation; never skip adoption,
+        # expiry changes, key rotation, revocation or an explicit create.
+        if (not must_create and ctx.credential is not None and not ctx.legacy
+                and self.baseline is not None and desired == baseline
+                and not self.rotating and not self.flushed and not self.increments):
+            return
         with bounded_atomic():
             # Explicit draft saves on a legacy session must not silently promote
             # it before a later 500 response. Adoption belongs to final response.
@@ -235,7 +242,13 @@ class SessionStore(DBStore):
                 ids.update(Credential.objects.filter(key_hash__in=[digest(key) for key in ctx.presented_keys]).values_list('family_id', flat=True))
             if ctx.family is not None:
                 ids.add(ctx.family.id)
-            locked = {row.id: row for row in Family.objects.select_for_update(nowait=True).filter(id__in=ids).order_by('id')}
+            # Only ordinary writes to an existing generation may briefly wait.
+            # bounded_atomic supplies the existing transaction-local lock limit.
+            # Rotation/revocation and adoption retain immediate conflict handling.
+            ordinary_write = (ctx.credential is not None and not ctx.legacy
+                              and not self.rotating and not self.flushed)
+            locked = {row.id: row for row in Family.objects.select_for_update(
+                nowait=not ordinary_write).filter(id__in=ids).order_by('id')}
             family = locked.get(ctx.family.id) if ctx.family is not None else None
             if self.flushed:
                 Session.objects.filter(session_key__in=ctx.presented_keys).delete()
@@ -315,9 +328,15 @@ class SessionStore(DBStore):
                 ctx.emit = True
             else:
                 key, credential = current_key, ctx.credential
-                Session.objects.filter(session_key=key).update(session_data=self.encode(merged), expire_date=self.get_expiry_date())
-            family.expires_at = max(family.expires_at, self.get_expiry_date())
-            family.save(update_fields=['epoch', 'active_generation', 'expires_at'])
+                # Another request may already have applied the exact same change.
+                # Generation/expiry were checked under locks above; do not renew
+                # or rewrite identical data merely because it was submitted twice.
+                if merged != current:
+                    Session.objects.filter(session_key=key).update(
+                        session_data=self.encode(merged), expire_date=self.get_expiry_date())
+            if needs_generation or merged != current:
+                family.expires_at = max(family.expires_at, self.get_expiry_date())
+                family.save(update_fields=['epoch', 'active_generation', 'expires_at'])
             ctx.family, ctx.credential = family, credential
             ctx.scopes[family.id] = (family, ctx.secret)
             ctx.revoke_ids.add(family.id)

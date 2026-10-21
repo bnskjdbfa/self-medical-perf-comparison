@@ -477,7 +477,11 @@ class AdminPagesTest(TestCase):
             response = self.client.get(reverse('admins:prototype-manager'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertLessEqual(len(captured), 10)
+        # PostgreSQL adds transaction-local safety settings, not a lookup
+        # query per participant. Keep the existing lookup budget for all other SQL.
+        lookup_queries = [q for q in captured
+                          if not q['sql'].startswith("SELECT set_config('lock_timeout',")]
+        self.assertLessEqual(len(lookup_queries), 10)
         self.assertEqual(response.context['pagination']['total_count'], 32)
         self.assertEqual(len(response.context['rows']), 20)
 

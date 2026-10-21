@@ -1,0 +1,66 @@
+{
+  "baseline_commit": "4756458113560100292fe4ec70dc8fdb6a376cc3",
+  "candidate": "uncommitted local files; not deployed",
+  "service_sources": {
+    "config/db_limits.py": "72aafd0859abeb99ee8f5078ad5be29bf20f1a6c341e5dcf37b47c4266b7e201",
+    "config/session_backend.py": "1fb6a55e201bb933f059a5ea93a765a80021baece82a5c62e778f6d0539cd906",
+    "config/session_middleware.py": "2aa6d874c122a259de401738f648a1181c6f43e180dbe21311ab4be3c619a024",
+    "surveys/views.py": "66e602dd78c8dc40b390a80ab1e15bd55ade5cb6df5ca5908c23f1fb085ea171",
+    "surveys/required_documents.py": "a781b5fe1ee78fe8758204c24f4d1c494bf2fddbc4b63363d4d2b1d35a860499"
+  },
+  "service_digest": "6f643c62a780a5510b6c8a4cdcef4f4896e1bef120c53f6ed6d3753458c6ff33",
+  "full_project_tests": {
+    "passed": 422,
+    "new_tests": 9
+  },
+  "tool_tests_passed": 21,
+  "node_collector_tests": "pass",
+  "staging_tests": "not_run",
+  "production_changes": false,
+  "measurements": {
+    "before": {
+      "single_journey_ms": {
+        "p50": 19894.172,
+        "p95": 19894.172
+      },
+      "concurrent_journey_ms": {
+        "p50": 50580.676,
+        "p95": 52727.837
+      },
+      "wall_seconds": 52.8,
+      "health_max_queue_ms": 5383.493,
+      "health_samples": 30,
+      "health_queue_over_5s": 1,
+      "stored_submissions": 44,
+      "unlocked": 0,
+      "bad_answer_rows": 0,
+      "connection_sampling": {
+        "worker_peak": 16,
+        "worker_active_peak": 6,
+        "samples": 6571
+      }
+    },
+    "after": {
+      "single_journey_ms": {
+        "p50": 19655.327,
+        "p95": 19655.327
+      },
+      "concurrent_journey_ms": {
+        "p50": 51190.973,
+        "p95": 53108.055
+      },
+      "wall_seconds": 53.427,
+      "health_max_queue_ms": 3878.103,
+      "health_samples": 29,
+      "health_queue_over_5s": 0,
+      "stored_submissions": 44,
+      "unlocked": 0,
+      "bad_answer_rows": 0,
+      "connection_sampling": {
+        "worker_peak": 16,
+        "worker_active_peak": 5,
+        "samples": 6582
+      }
+    }
+  }
+}
