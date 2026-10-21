@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, connection
+from django.db.models import FilteredRelation, Q
 from django.template.loader import render_to_string
 from django.utils import timezone
 from config.db_limits import bounded_atomic, policy_row
@@ -147,6 +148,24 @@ def get_submitted_required_document_types(*, team: Team, respondent: Respondent)
 
 
 def get_required_document_progress(*, team: Team, respondent: Respondent) -> RequiredDocumentProgress:
+    if connection.vendor == 'postgresql':
+        from django.contrib.postgres.aggregates import ArrayAgg
+        # Read configuration and this respondent's evidence in one snapshot.
+        # Filter the JOIN, not just the aggregate, to avoid scanning the team's
+        # other participants. No cross-request cache or permission bypass.
+        flags = {kind: 'feature_settings__' + FEATURE_FIELD_BY_DOCUMENT_TYPE[kind]
+                 for kind in REQUIRED_DOCUMENT_ORDER}
+        row = (Team.objects.filter(pk=team.pk).annotate(
+            progress_documents=FilteredRelation('document_submissions', condition=Q(
+                document_submissions__respondent_id=respondent.pk)))
+            .order_by('pk').values(*flags.values()).annotate(submitted=ArrayAgg(
+                'progress_documents__document_type', distinct=True,
+                filter=Q(progress_documents__document_type__isnull=False), default=[]))
+            .first())
+        return RequiredDocumentProgress(
+            enabled_types=tuple(kind for kind, field in flags.items() if row and row[field]),
+            submitted_types=frozenset(row['submitted'] if row else ()),
+        )
     return RequiredDocumentProgress(
         enabled_types=get_enabled_required_document_types(team),
         submitted_types=get_submitted_required_document_types(team=team, respondent=respondent),

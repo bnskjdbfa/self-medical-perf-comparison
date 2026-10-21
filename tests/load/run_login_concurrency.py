@@ -238,7 +238,7 @@ def main():
                         sys.executable, 'manage.py', 'test', 'surveys.test_login_concurrency',
                         'surveys.test_login_deployment', 'surveys.tests.RequiredDocumentFlowTest',
                         'surveys.test_session_rotation_writes', 'surveys.test_identity_round_trips',
-                        'surveys.test_session_duplicate_writes',
+                        'surveys.test_session_duplicate_writes', 'surveys.test_document_progress_queries',
                         '--verbosity', '0',
                     ], cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                         env={**os.environ, 'DJANGO_SETTINGS_MODULE': 'login_test_settings',

@@ -1,0 +1,47 @@
+{
+  "baseline": "5adf5d793f116c000238c19d56ef6b87486dd5ae",
+  "scope": "local PostgreSQL; synthetic 70ms DB RTT, not Render",
+  "full_project_tests": 425,
+  "regression_tests": 125,
+  "staging": "not run",
+  "production_deploy": "not performed",
+  "final_rule": "one candidate only; staging normal x2 and duplicates x1 then final verdict; no further tuning today",
+  "cases": {
+    "before": {
+      "wall_s": 53.392,
+      "journey_ms": {
+        "p50": 51191.346,
+        "p95": 53017.274
+      },
+      "health_n": 23,
+      "health_failures": 1,
+      "health_max_observed_ms": 5001.637939453125,
+      "db_worker_peak": 16,
+      "stored": 44,
+      "bad_answers": 0,
+      "unlocked": 0
+    },
+    "after": {
+      "wall_s": 50.033,
+      "journey_ms": {
+        "p50": 48063.061,
+        "p95": 49712.548
+      },
+      "health_n": 25,
+      "health_failures": 0,
+      "health_max_observed_ms": 4401.576917007333,
+      "db_worker_peak": 16,
+      "stored": 44,
+      "bad_answers": 0,
+      "unlocked": 0
+    }
+  },
+  "service_sources": {
+    "config/db_limits.py": "72aafd0859abeb99ee8f5078ad5be29bf20f1a6c341e5dcf37b47c4266b7e201",
+    "config/session_backend.py": "1fb6a55e201bb933f059a5ea93a765a80021baece82a5c62e778f6d0539cd906",
+    "config/session_middleware.py": "2aa6d874c122a259de401738f648a1181c6f43e180dbe21311ab4be3c619a024",
+    "surveys/views.py": "66e602dd78c8dc40b390a80ab1e15bd55ade5cb6df5ca5908c23f1fb085ea171",
+    "surveys/required_documents.py": "edd8512b27fd7324de4d9ebac66bcbb2d68deb62311e8be72b27527fc735f285"
+  },
+  "service_digest": "e35527e8e3e51b1c603455de7d30d194aa3b9cc81dbd91c8f459b5d5844628b6"
+}
